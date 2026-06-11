@@ -157,6 +157,24 @@ class LLMService:
                 }
                 return json.dumps(failure_payload)
 
+            # Parse actual evaluated scores from prompt
+            score_fast = 58.0
+            score_safe = 68.0
+            score_bal = 74.0
+            try:
+                start_marker = "evaluated plan options:"
+                end_marker = "validation status:"
+                start_idx = prompt_lower.find(start_marker)
+                end_idx = prompt_lower.find(end_marker)
+                if start_idx != -1 and end_idx != -1:
+                    json_str = prompt[start_idx + len(start_marker):end_idx].strip()
+                    evals = json.loads(json_str)
+                    score_fast = evals.get("Fastest", {}).get("aggregate_score", score_fast)
+                    score_safe = evals.get("Safest", {}).get("aggregate_score", score_safe)
+                    score_bal = evals.get("Balanced", {}).get("aggregate_score", score_bal)
+            except Exception:
+                pass
+
             # Standard Decision logic parsing
             selected = "Balanced"
             justification = "The Balanced plan matches the current requirements, keeping costs low ($110k) while maintaining adequate safety and speed."
@@ -169,10 +187,6 @@ class LLMService:
                 "+2.5 hours delay compared to Fastest plan.",
                 "Leaves 10% of outskirts area unmapped."
             ]
-
-            score_bal = 74.0
-            score_safe = 68.0
-            score_fast = 58.0
 
             # Context variables check
             confidence_val = 0.84 if selected == "Balanced" else 0.88
@@ -191,9 +205,6 @@ class LLMService:
                     "Longest duration path (9.0 hours).",
                     "Requires deployment of full shelter assets."
                 ]
-                score_safe = 78.0
-                score_bal = 62.0
-                score_fast = 42.0
                 confidence_val = 0.89
                 score_factor = 0.78
                 past_success_factor = 0.96
@@ -210,9 +221,6 @@ class LLMService:
                     "Requires significant tactical resource allocation.",
                     "Longer duration than Fastest strategy."
                 ]
-                score_safe = 81.0
-                score_bal = 65.0
-                score_fast = 38.0
                 confidence_val = 0.91
                 score_factor = 0.81
                 past_success_factor = 0.97
@@ -229,9 +237,6 @@ class LLMService:
                     "Substantial delay in timeline completion.",
                     "Increases budget usage close to constraint limit."
                 ]
-                score_safe = 75.0
-                score_bal = 58.0
-                score_fast = 35.0
                 confidence_val = 0.86
                 score_factor = 0.75
                 past_success_factor = 0.92
@@ -248,18 +253,25 @@ class LLMService:
                     "+6.0 hours delay compared to Fastest plan.",
                     "+$100,000 cost overhead."
                 ]
-                score_safe = 79.0
-                score_bal = 71.0
-                score_fast = 54.0
                 confidence_val = 0.88
                 score_factor = 0.79
                 past_success_factor = 0.95
 
-            ranking = [
-                {"plan": selected, "score": max(score_bal, score_safe, score_fast), "rank": 1},
-                {"plan": "Safest" if selected != "Safest" else "Balanced", "score": score_safe if selected != "Safest" else score_bal, "rank": 2},
-                {"plan": "Fastest", "score": score_fast, "rank": 3}
+            # Dynamic ranking sorted by actual aggregate score
+            plan_scores = [
+                ("Fastest", score_fast),
+                ("Safest", score_safe),
+                ("Balanced", score_bal)
             ]
+            plan_scores.sort(key=lambda x: x[1], reverse=True)
+            
+            ranking = []
+            for rank_idx, (name, score) in enumerate(plan_scores):
+                ranking.append({
+                    "plan": name,
+                    "score": score,
+                    "rank": rank_idx + 1
+                })
 
             decision_payload = {
                 "status": "completed",
