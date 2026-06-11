@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEGIS: Deliberative Autonomous Decision Intelligence System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="glow-overlay"></div>
+    <div class="container">
+        
+        <!-- Header -->
+        <header class="app-header glass-card">
+            <div class="logo-area">
+                <div class="pulse-indicator status-ready" id="pulse-indicator-node"></div>
+                <h1>AEGIS</h1>
+                <span class="sub-logo">Deliberative Autonomous Decision Intelligence System</span>
+            </div>
+            <div class="quote-container">
+                <p class="positioning-statement">
+                    “AEGIS combines deterministic planning with LLM-powered reasoning to create a hybrid autonomous system capable of independent decision-making under uncertainty, while maintaining human-in-the-loop control.”
+                </p>
+            </div>
+            <div class="global-status">
+                <div class="status-item">
+                    <span class="label">System State</span>
+                    <span id="system-status-val" class="value text-cyan">Ready</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">Alert State</span>
+                    <span id="alert-level-val" class="value badge badge-green">GREEN</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- TOP STRIP: CRISIS CONTEXT -->
+        <div class="crisis-context-strip glass-card" id="context-strip">
+            <div class="context-title">
+                <span class="context-alert-pulse">🚨</span>
+                <span class="bold uppercase">CRISIS CONTEXT</span>
+            </div>
+            <div class="context-metrics-row">
+                <div class="context-metric">
+                    <span class="label">Flood Level:</span>
+                    <span id="context-flood-val" class="value text-red bold">3.2m (CRITICAL)</span>
+                </div>
+                <div class="context-metric">
+                    <span class="label">Unrest Index:</span>
+                    <span id="context-unrest-val" class="value text-red bold">82 (HIGH)</span>
+                </div>
+                <div class="context-metric">
+                    <span class="label">Available Teams:</span>
+                    <span id="context-teams-val" class="value text-green bold">2</span>
+                </div>
+                <div class="context-metric">
+                    <span class="label">Hospitals:</span>
+                    <span id="context-hospitals-val" class="value text-green bold">2</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid Layout -->
+        <div class="dashboard-grid-layout">
+            
+            <!-- LEFT PANEL: Controls & Timeline -->
+            <section class="grid-area-left">
+                <!-- Human-in-the-loop Control Panel -->
+                <div class="glass-card control-card">
+                    <h2 class="section-title text-cyan">CONTROL PANEL (HUMAN-IN-LOOP)</h2>
+                    
+                    <div class="preset-selector-box">
+                        <span class="sub-label">Select Scenario Variant</span>
+                        <select id="select-variant" class="variant-select">
+                            <option value="variant_a">Variant A: Moderate Flood & Low Unrest</option>
+                            <option value="variant_b" selected>Variant B: Storm Surge & Extreme Unrest</option>
+                            <option value="variant_c">Variant C: Severe Surge & Riot (Failure Path)</option>
+                        </select>
+                    </div>
+
+                    <div class="button-control-grid">
+                        <button id="btn-control-start" class="btn btn-primary btn-glow">▶ Start</button>
+                        <button id="btn-control-pause" class="btn btn-outline" disabled>⏸ Pause</button>
+                        <button id="btn-control-step" class="btn btn-outline">⏭ Step</button>
+                        <button id="btn-control-stop" class="btn btn-danger-dim" disabled>⛔ Stop</button>
+                    </div>
+
+                    <div class="mode-readout-row font-small">
+                        <span>Status: <strong id="readout-status-val" class="text-cyan">Ready</strong></span>
+                        <span>Current Agent: <strong id="readout-agent-val" class="text-amber">None</strong></span>
+                    </div>
+
+                    <div class="disruption-center">
+                        <h3 class="subsection-title text-red">Anomaly Disruption Injector</h3>
+                        <p class="help-text">Inject events to force real-time replanning detours.</p>
+                        <div class="disruption-feedback font-mono text-cyan font-small" id="disruption-feedback-msg" style="margin-bottom: 8px; font-style: italic; display: none;"></div>
+                        <div class="event-triggers">
+                            <button id="btn-event-bridge" class="btn btn-danger" disabled>💥 Bridge Collapse</button>
+                            <button id="btn-event-riot" class="btn btn-danger" disabled>🔥 Riot Outbreak</button>
+                            <button id="btn-event-storm" class="btn btn-danger" disabled>⛈️ Severe Downpour</button>
+                        </div>
+                        <button id="btn-reset" class="btn btn-outline btn-reset">🔄 Reset System Parameters</button>
+                    </div>
+                </div>
+
+                <!-- System Execution Timeline & Loop Visibility -->
+                <div class="glass-card timeline-card">
+                    <h2 class="section-title text-cyan">SYSTEM EXECUTION</h2>
+                    <div class="stepper-timeline" id="stepper-timeline-container">
+                        <div class="timeline-step" id="step-node-1">
+                            <div class="step-num-circle">1</div>
+                            <div class="step-details">
+                                <div class="step-title">SignalAgent <span class="step-status text-dim">Pending</span></div>
+                                <p class="step-desc font-small">Generates weather/social incident metrics</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step" id="step-node-2">
+                            <div class="step-num-circle">2</div>
+                            <div class="step-details">
+                                <div class="step-title">DetectionAgent <span class="step-status text-dim">Pending</span></div>
+                                <p class="step-desc font-small">Calculates alert levels & Severity Index</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step" id="step-node-3">
+                            <div class="step-num-circle">3</div>
+                            <div class="step-details">
+                                <div class="step-title">PlannerAgent <span class="step-status text-dim">Pending</span></div>
+                                <p class="step-desc font-small">Prompt-driven LLM planning strategy drafting</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step" id="step-node-4">
+                            <div class="step-num-circle">4</div>
+                            <div class="step-details">
+                                <div class="step-title">ValidationAgent <span class="step-status text-dim">Pending</span></div>
+                                <p class="step-desc font-small">Audits plans against budget/safety constraints</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step" id="step-node-5">
+                            <div class="step-num-circle">5</div>
+                            <div class="step-details">
+                                <div class="step-title">MemoryAgent <span class="step-status text-dim">Pending</span></div>
+                                <p class="step-desc font-small">Correlates metrics with historical cases</p>
+                            </div>
+                        </div>
+                        <div class="timeline-step" id="step-node-6">
+                            <div class="step-num-circle">6</div>
+                            <div class="step-details">
+                                <div class="step-title">DecisionAgent <span class="step-status text-dim">Pending</span></div>
+                                <p class="step-desc font-small">Resolves rankings, selections, and rejections</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loop and Iteration Visibility Stats -->
+                    <div class="loop-stats-box font-small mt-3">
+                        <span class="sub-label text-dim uppercase">Self-Optimization Telemetry</span>
+                        <div class="stats-row">
+                            <span>Planning Iterations: <strong id="metric-iterations-count" class="text-cyan">0</strong></span>
+                            <span>Validation Failures: <strong id="metric-failures-count" class="text-red">0</strong></span>
+                        </div>
+                        <div class="stats-row">
+                            <span>Total Agents Executed: <strong id="metric-agents-count" class="text-cyan">0</strong></span>
+                            <span>Replans Triggered: <strong id="metric-replans-count" class="text-amber">0</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CENTER PANEL: Final Decision & Alternatives -->
+            <section class="grid-area-center">
+                <!-- Fallback Escalation Alert Box (Failure Mode Panel) -->
+                <div id="fallback-escalation-alert" class="glass-card escalation-card border-red hidden">
+                    <div class="alert-header">
+                        <span style="font-size: 1.5rem; margin-right: 0.5rem;">⚠️</span>
+                        <h2 class="text-red uppercase bold">NO FEASIBLE PLAN</h2>
+                    </div>
+                    <div class="failure-reason-box" style="margin-bottom: 1rem;">
+                        <span class="sub-label text-red">Reason:</span>
+                        <ul class="bullets-red font-small" id="escalation-reasons-list" style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 4px;">
+                            <!-- JS -->
+                        </ul>
+                    </div>
+                    <div class="fallback-box">
+                        <span class="sub-label text-red">Fallback:</span>
+                        <p id="escalation-fallback-val" class="fallback-text bold">-</p>
+                    </div>
+                </div>
+
+                <!-- Final Decision Panel -->
+                <div class="glass-card decision-card border-purple" id="decision-main-panel">
+                    <h2 class="section-title text-purple">✅ FINAL DECISION</h2>
+                    <div id="no-decision-msg" class="empty-state-text">
+                        No active decision. Run simulation to begin.
+                    </div>
+                    
+                    <div id="decision-content" class="decision-content hidden">
+                        <div class="decision-highlight">
+                            <div class="selected-plan-banner">
+                                <span class="badge badge-purple uppercase">Optimal Choice Selected</span>
+                                <h3 id="decision-plan-name" class="plan-hero-title">-</h3>
+                            </div>
+                            <div class="confidence-wrapper">
+                                <span class="sub-label">Confidence Index</span>
+                                <div class="confidence-circle-radial">
+                                    <div class="confidence-inner-val" id="decision-confidence-val">0%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Decision Status row -->
+                        <div class="decision-status-row font-mono" style="margin-top: 10px; padding: 8px 12px; background: rgba(255, 255, 255, 0.02); border-radius: 6px; display: flex; justify-content: space-between; border-left: 3px solid var(--color-cyan);">
+                            <span class="sub-label" style="margin-bottom: 0;">STATUS:</span>
+                            <span id="decision-status-text" class="status-value text-green bold">Nominal Execution</span>
+                        </div>
+
+                        <!-- Explainability Summary Block -->
+                        <div class="explainability-summary-grid">
+                            <div class="explain-why-box">
+                                <span class="sub-label text-green">WHY THIS PLAN:</span>
+                                <ul id="decision-why-list" class="bullets-green">
+                                    <!-- JS -->
+                                </ul>
+                            </div>
+                            <div class="explain-tradeoffs-box">
+                                <span class="sub-label text-amber">TRADE-OFFS:</span>
+                                <ul id="decision-tradeoffs-list" class="bullets-amber">
+                                    <!-- JS -->
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Leaderboard rankings comparison -->
+                        <div class="rankings-leaderboard">
+                            <span class="sub-label text-cyan">Optimal Plan Leaderboard:</span>
+                            <div id="leaderboard-container" class="leaderboard-grid">
+                                <!-- JS -->
+                            </div>
+                        </div>
+
+                        <!-- Justification details -->
+                        <div class="justification-box">
+                            <span class="sub-label">LLM Reasoning Justification:</span>
+                            <p id="decision-justification-val" class="description-text">-</p>
+                        </div>
+
+                        <!-- Precedent memory narrative -->
+                        <div class="memory-narrative-container">
+                            <div class="memory-header">
+                                <span class="icon">🧠</span>
+                                <h4>Experience-Based Precedent</h4>
+                            </div>
+                            <div class="memory-details font-small">
+                                <div class="meta-row">
+                                    <span class="label">Matched Reference:</span>
+                                    <span class="value" id="decision-memory-case">-</span>
+                                </div>
+                                <p class="description-text" id="decision-memory-narrative">-</p>
+                            </div>
+                        </div>
+
+                        <!-- Rejected plans reasoning -->
+                        <div class="rejected-box">
+                            <span class="sub-label text-red">Deliberation & Rejections:</span>
+                            <ul id="rejected-plans-list" class="rejected-list"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Strategic Alternatives details -->
+                <div class="glass-card plans-card">
+                    <h2 class="section-title text-cyan">Strategic Action Alternatives</h2>
+                    <div id="no-plans-msg" class="empty-state-text">
+                        No strategies generated yet.
+                    </div>
+                    <div id="plans-container" class="plans-container hidden">
+                        <!-- Fastest -->
+                        <div class="plan-subcard border-amber" id="card-Fastest">
+                            <div class="plan-header">
+                                <h3 class="plan-title">Fastest Strategy</h3>
+                                <span class="badge badge-amber">High Risk</span>
+                            </div>
+                            <p class="plan-desc" id="plan-Fastest-desc">-</p>
+                            <div class="plan-meta">
+                                <div class="meta-item"><span class="label">Duration:</span><span id="plan-Fastest-time" class="value">-</span></div>
+                                <div class="meta-item"><span class="label">Cost:</span><span id="plan-Fastest-cost" class="value">-</span></div>
+                                <div class="meta-item"><span class="label">Coverage:</span><span id="plan-Fastest-coverage" class="value">-</span></div>
+                            </div>
+                            <div class="plan-steps">
+                                <span class="sub-label">Evacuation Sequence:</span>
+                                <ol id="plan-Fastest-steps" class="steps-list"></ol>
+                            </div>
+                        </div>
+
+                        <!-- Safest -->
+                        <div class="plan-subcard border-green" id="card-Safest">
+                            <div class="plan-header">
+                                <h3 class="plan-title">Safest Strategy</h3>
+                                <span class="badge badge-green">Low Risk</span>
+                            </div>
+                            <p class="plan-desc" id="plan-Safest-desc">-</p>
+                            <div class="plan-meta">
+                                <div class="meta-item"><span class="label">Duration:</span><span id="plan-Safest-time" class="value">-</span></div>
+                                <div class="meta-item"><span class="label">Cost:</span><span id="plan-Safest-cost" class="value">-</span></div>
+                                <div class="meta-item"><span class="label">Coverage:</span><span id="plan-Safest-coverage" class="value">-</span></div>
+                            </div>
+                            <div class="plan-steps">
+                                <span class="sub-label">Evacuation Sequence:</span>
+                                <ol id="plan-Safest-steps" class="steps-list"></ol>
+                            </div>
+                        </div>
+
+                        <!-- Balanced -->
+                        <div class="plan-subcard border-cyan" id="card-Balanced">
+                            <div class="plan-header">
+                                <h3 class="plan-title">Balanced Strategy</h3>
+                                <span class="badge badge-cyan">Moderate Risk</span>
+                            </div>
+                            <p class="plan-desc" id="plan-Balanced-desc">-</p>
+                            <div class="plan-meta">
+                                <div class="meta-item"><span class="label">Duration:</span><span id="plan-Balanced-time" class="value">-</span></div>
+                                <div class="meta-item"><span class="label">Cost:</span><span id="plan-Balanced-cost" class="value">-</span></div>
+                                <div class="meta-item"><span class="label">Coverage:</span><span id="plan-Balanced-coverage" class="value">-</span></div>
+                            </div>
+                            <div class="plan-steps">
+                                <span class="sub-label">Evacuation Sequence:</span>
+                                <ol id="plan-Balanced-steps" class="steps-list"></ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT PANEL: Comparison Table & Constraints -->
+            <section class="grid-area-right">
+                <!-- Plan Comparison Table -->
+                <div class="glass-card evaluation-card">
+                    <h2 class="section-title text-cyan">Plan Comparison Grid</h2>
+                    <div id="no-eval-msg" class="empty-state-text">
+                        Scores awaiting plan metrics.
+                    </div>
+                    <div id="evaluation-container" class="hidden">
+                        <table class="eval-table">
+                            <thead>
+                                <tr>
+                                    <th>Plan</th>
+                                    <th>Time</th>
+                                    <th>Risk</th>
+                                    <th>Cost</th>
+                                    <th>Coverage</th>
+                                    <th class="highlight-th">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="eval-row-Fastest">
+                                    <td class="text-amber bold">Fastest</td>
+                                    <td id="eval-Fastest-time">-</td>
+                                    <td id="eval-Fastest-risk">-</td>
+                                    <td id="eval-Fastest-cost">-</td>
+                                    <td id="eval-Fastest-coverage">-</td>
+                                    <td id="eval-Fastest-agg" class="bold">-</td>
+                                </tr>
+                                <tr id="eval-row-Safest">
+                                    <td class="text-green bold">Safest</td>
+                                    <td id="eval-Safest-time">-</td>
+                                    <td id="eval-Safest-risk">-</td>
+                                    <td id="eval-Safest-cost">-</td>
+                                    <td id="eval-Safest-coverage">-</td>
+                                    <td id="eval-Safest-agg" class="bold">-</td>
+                                </tr>
+                                <tr id="eval-row-Balanced">
+                                    <td class="text-cyan bold">Balanced</td>
+                                    <td id="eval-Balanced-time">-</td>
+                                    <td id="eval-Balanced-risk">-</td>
+                                    <td id="eval-Balanced-cost">-</td>
+                                    <td id="eval-Balanced-coverage">-</td>
+                                    <td id="eval-Balanced-agg" class="bold">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="validation-status-box font-small">
+                            <span class="sub-label">Feasibility Audit:</span>
+                            <div class="audit-badge" id="validation-badge">Pending</div>
+                            <ul id="validation-issues-list" class="issues-list"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explicit Constraints Card -->
+                <div class="glass-card constraints-card">
+                    <h2 class="section-title text-cyan">Formal System Constraints</h2>
+                    <div class="constraints-list">
+                        <div class="constraint-item">
+                            <div class="constraint-meta">
+                                <span class="label">MAX BUDGET LIMIT</span>
+                                <span class="value text-red">$220,000</span>
+                            </div>
+                            <div class="constraint-status-bar"><div class="constraint-fill fill-red" style="width: 100%"></div></div>
+                        </div>
+                        <div class="constraint-item">
+                            <div class="constraint-meta">
+                                <span class="label">MAX RISK CEILING</span>
+                                <span class="value text-amber">4.0 / 5.0</span>
+                            </div>
+                            <div class="constraint-status-bar"><div class="constraint-fill fill-amber" style="width: 80%"></div></div>
+                        </div>
+                        <div class="constraint-item">
+                            <div class="constraint-meta">
+                                <span class="label">MIN POPULATION COVERAGE</span>
+                                <span class="value text-green">70%</span>
+                            </div>
+                            <div class="constraint-status-bar"><div class="constraint-fill fill-green" style="width: 70%"></div></div>
+                        </div>
+                    </div>
+                    <div class="escort-notice">
+                        <span class="sub-label">Riot escorts check:</span>
+                        <p class="help-text">If unrest level exceeds 70%, ground transit without security escorts fails safety validation audits.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BOTTOM LEFT: Agent Logs -->
+            <section class="grid-area-bottom-left">
+                <div class="glass-card logs-card" style="height: 100%;">
+                    <h2 class="section-title text-cyan">Cognitive Message Bus</h2>
+                    <div class="terminal-container">
+                        <div class="terminal-header">
+                            <span class="dot red-dot"></span>
+                            <span class="dot yellow-dot"></span>
+                            <span class="dot green-dot"></span>
+                            <span class="terminal-title">aegis@intelligence:~</span>
+                        </div>
+                        <div id="terminal-logs" class="terminal-logs" style="height: 220px;">
+                            <div class="log-line text-dim">AEGIS ready. Awaiting crisis simulation...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BOTTOM RIGHT: Disruption Impact -->
+            <section class="grid-area-bottom-right">
+                <!-- Active comparison card -->
+                <div class="glass-card replan-card border-red hidden" id="replan-comparison-card" style="height: 100%;">
+                    <div class="replan-header">
+                        <div class="pulse-indicator status-disrupted"></div>
+                        <h2 class="section-title text-red">⚡ DISRUPTION IMPACT</h2>
+                    </div>
+                    <p class="disruption-title-sub">EVENT: <span id="disruption-name-val" class="bold">-</span></p>
+                    
+                    <div class="comparison-grid">
+                        <div class="comparison-panel before">
+                            <div class="panel-tag">BEFORE:</div>
+                            <h3 id="replan-before-plan" class="bold">-</h3>
+                            <div class="meta-row">
+                                <span class="label">Confidence:</span>
+                                <span id="replan-before-conf" class="value">-</span>
+                            </div>
+                        </div>
+                        <div class="comparison-arrow">➡️</div>
+                        <div class="comparison-panel after">
+                            <div class="panel-tag bg-red text-white">AFTER:</div>
+                            <h3 id="replan-after-plan" class="bold text-red">-</h3>
+                            <div class="meta-row">
+                                <span class="label">Confidence:</span>
+                                <span id="replan-after-conf" class="value text-red">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="justification-box font-small border-red-dim">
+                        <span class="sub-label text-red">REASON:</span>
+                        <p id="replan-adaptation-reason" class="description-text font-small">-</p>
+                    </div>
+                </div>
+
+                <!-- Empty state placeholder card -->
+                <div class="glass-card empty-replan-card font-small text-dim text-center" id="replan-empty-card" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 220px; border: 1px dashed var(--border-color); border-radius: 16px; background: rgba(255,255,255,0.01); padding: 1.5rem;">
+                    <p>Awaiting disruption event injection to compute real-time strategic adaptations...</p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
