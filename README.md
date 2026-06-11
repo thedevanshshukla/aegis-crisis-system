@@ -89,18 +89,23 @@ pip install -r backend/requirements.txt
 ```
 
 ### 2. Run Automated Validation Tests
-Run the cognitive test suite to verify agent logic, memory boosts, feedback loops, and reasoning formats:
-```bash
-python test_cognitive.py
-```
+Run the cognitive and orchestration integration test suites to verify system behavior, loops, memory boosts, and adaptation:
+- **Core Cognitive Logic & Refinement Loop Tests**:
+  ```bash
+  python test_cognitive.py
+  ```
+- **Scenario Variants & Orchestration Tests**:
+  ```bash
+  python test_hybrid.py
+  ```
 
 ### 3. Launch the Server
-Boot the FastAPI application and serve the frontend at the same time:
+Boot the FastAPI application serving both the REST API and the frontend dashboard at the same time:
 ```bash
 python run.py
 ```
-Open your web browser and navigate to:
-👉 **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
+Open your web browser and navigate to the dashboard at:
+👉 **[http://127.0.0.1:8086](http://127.0.0.1:8086)**
 
 ---
 
@@ -108,11 +113,23 @@ Open your web browser and navigate to:
 
 The backend exposes the following REST endpoints:
 
-- `GET /api/state`: Returns the current system `TaskState` payload.
-- `POST /api/reset`: Wipes the global in-memory state back to ready defaults.
-- `POST /api/simulate`: Step 1 - SignalAgent simulates metrics, DetectionAgent checks alerts.
-- `POST /api/plan`: Step 2 - PlannerAgent drafts action steps.
-- `POST /api/evaluate`: Step 3 - Evaluator & Validation agents run scoring and correction loops.
-- `POST /api/decide`: Step 4 - Memory precedent matching boosts scores, Decision selects optimal plan.
-- `POST /api/replan`: Step 5 - Inject a disruption (e.g. `bridge_collapse`, `riot_outbreak`, `severe_downpour`) and run evaluations/decisions again.
-- `POST /api/run_full`: Performs the entire orchestrated sequence in a single network pass.
+- `GET /api/state`: Returns the current system `TaskState` payload containing logs, plans, and metrics.
+- `GET /api/config`: Exposes system rules, thresholds (e.g. maximum budget, risk ceilings, minimum coverage), and severity labels.
+- `POST /api/reset`: Wipes the global in-memory state back to ready defaults and cancels any running background tasks.
+- `POST /api/run_full`: Starts the full multi-agent orchestration flow in the background. Accepts optional JSON body specifying the variant and execution mode:
+  ```json
+  {
+    "variant": "variant_b",
+    "mode": "auto"
+  }
+  ```
+- `POST /api/pause`: Pauses execution (holds execution at the active step loop).
+- `POST /api/resume`: Resumes execution (shifts execution mode back to auto).
+- `POST /api/step`: Runs a single agent step and pauses execution again.
+- `POST /api/stop`: Manually terminates execution.
+- `POST /api/replan`: Injects a real-time environmental anomaly and triggers the replanning cycle. Expects:
+  ```json
+  {
+    "event_type": "bridge_collapse"
+  }
+  ```
