@@ -143,6 +143,11 @@ async def replan(payload: Dict[str, str] = Body(...)):
     
     return {"status": "replanning_started", "state": current_state}
 
+@app.get("/architecture")
+async def get_architecture():
+    """Serve the system architecture flowchart page."""
+    return FileResponse(os.path.join(FRONTEND_DIR, "architecture.html"))
+
 # Serve frontend static files
 if os.path.exists(FRONTEND_DIR):
     app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
