@@ -37,6 +37,7 @@ class DecisionAgent(BaseAgent):
         - water_level: {state.scenario.water_level if state.scenario else 0}m
         - crowd_size: {state.scenario.crowd_size if state.scenario else 0}
         - unrest_level: {state.scenario.unrest_level if state.scenario else 0}%
+        - active_disruption: {state.disruption_event or "None"}
         
         If all plans fail validation (e.g. costs exceed $220k budget ceiling or safety limits breached) and cannot be corrected, return 'status': 'no_feasible_plan', and supply a 'fallback' text: 'Partial evacuation with delayed full deployment until escorts or air bridges are established.'.
         Otherwise return 'status': 'completed' and select the highest ranking valid plan.

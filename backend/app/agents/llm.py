@@ -175,21 +175,9 @@ class LLMService:
             score_fast = 58.0
 
             # Context variables check
-            if "water_level: 2.8" in prompt_lower or "water level: 2.8" in prompt_lower or "water_level: 3.2" in prompt_lower or "water level: 3.2" in prompt_lower or "safest strategy success rate" in prompt_lower:
-                selected = "Safest"
-                justification = "Safest plan selected because elevated flood heights (3.2m) and unrest (82%) require police escort columns to guarantee safety."
-                why_this_plan = [
-                    "Guarantees safety with joint armed police escorts.",
-                    "Covers 98% of the affected population.",
-                    "Reduces risk index to minimal levels (0.8/5.0)."
-                ]
-                trade_offs = [
-                    "+6.0 hours delay compared to Fastest plan.",
-                    "+$100,000 cost overhead."
-                ]
-                score_safe = 79.0
-                score_bal = 71.0
-                score_fast = 54.0
+            confidence_val = 0.84 if selected == "Balanced" else 0.88
+            score_factor = 0.74 if selected == "Balanced" else 0.79
+            past_success_factor = 0.88 if selected == "Balanced" else 0.95
 
             if "bridge_collapse" in prompt_lower or "bridge collapse" in prompt_lower:
                 selected = "Safest"
@@ -206,6 +194,66 @@ class LLMService:
                 score_safe = 78.0
                 score_bal = 62.0
                 score_fast = 42.0
+                confidence_val = 0.89
+                score_factor = 0.78
+                past_success_factor = 0.96
+
+            elif "riot_outbreak" in prompt_lower or "riot outbreak" in prompt_lower or "unrest_level: 95" in prompt_lower:
+                selected = "Safest"
+                justification = "Safest plan selected because the active riot outbreak (95% unrest) requires tactical security escorts to ensure safe transit of evacuation convoys."
+                why_this_plan = [
+                    "Deploys military police escorts to secure transit routes.",
+                    "Minimizes casualty risk under active unrest (0.8/5.0).",
+                    "Maintains maximum coverage of 98%."
+                ]
+                trade_offs = [
+                    "Requires significant tactical resource allocation.",
+                    "Longer duration than Fastest strategy."
+                ]
+                score_safe = 81.0
+                score_bal = 65.0
+                score_fast = 38.0
+                confidence_val = 0.91
+                score_factor = 0.81
+                past_success_factor = 0.97
+
+            elif "severe_downpour" in prompt_lower or "severe downpour" in prompt_lower:
+                selected = "Safest"
+                justification = "Safest plan selected because torrential rainfall (130 mm/h) and high water level (3.9m) compromise secondary routes and ground assets."
+                why_this_plan = [
+                    "Safest corridors avoid vulnerable low-lying roads.",
+                    "Includes specialized flood-response staging assets.",
+                    "Mitigates increased transit risks."
+                ]
+                trade_offs = [
+                    "Substantial delay in timeline completion.",
+                    "Increases budget usage close to constraint limit."
+                ]
+                score_safe = 75.0
+                score_bal = 58.0
+                score_fast = 35.0
+                confidence_val = 0.86
+                score_factor = 0.75
+                past_success_factor = 0.92
+
+            elif "water_level: 2.8" in prompt_lower or "water level: 2.8" in prompt_lower or "water_level: 3.2" in prompt_lower or "water level: 3.2" in prompt_lower or "safest strategy success rate" in prompt_lower:
+                selected = "Safest"
+                justification = "Safest plan selected because elevated flood heights (3.2m) and unrest (82%) require police escort columns to guarantee safety."
+                why_this_plan = [
+                    "Guarantees safety with joint armed police escorts.",
+                    "Covers 98% of the affected population.",
+                    "Reduces risk index to minimal levels (0.8/5.0)."
+                ]
+                trade_offs = [
+                    "+6.0 hours delay compared to Fastest plan.",
+                    "+$100,000 cost overhead."
+                ]
+                score_safe = 79.0
+                score_bal = 71.0
+                score_fast = 54.0
+                confidence_val = 0.88
+                score_factor = 0.79
+                past_success_factor = 0.95
 
             ranking = [
                 {"plan": selected, "score": max(score_bal, score_safe, score_fast), "rank": 1},
@@ -216,11 +264,11 @@ class LLMService:
             decision_payload = {
                 "status": "completed",
                 "selected_plan": selected,
-                "confidence": 0.84 if selected == "Balanced" else 0.88,
+                "confidence": confidence_val,
                 "confidence_factors": {
-                    "score": 0.74 if selected == "Balanced" else 0.79,
+                    "score": score_factor,
                     "consistency": 0.90,
-                    "past_success": 0.88 if selected == "Balanced" else 0.95
+                    "past_success": past_success_factor
                 },
                 "ranking": ranking,
                 "justification": justification,
