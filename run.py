@@ -10,11 +10,16 @@ BACKEND_DIR = os.path.join(ROOT_DIR, "backend")
 sys.path.insert(0, BACKEND_DIR)
 
 if __name__ == "__main__":
+    host = os.environ.get("HOST", "127.0.0.1")
+    port = int(os.environ.get("PORT", 8086))
+
     print("--------------------------------------------------")
     print("   AEGIS: Autonomous Crisis Intelligence System   ")
     print("--------------------------------------------------")
-    print("Backend API & Frontend host launching on http://127.0.0.1:8086")
+    print(f"Backend API & Frontend host launching on http://{host}:{port}")
     print("Press Ctrl+C to shutdown.")
     print("--------------------------------------------------")
     
-    uvicorn.run("app.main:app", host="127.0.0.1", port=8086, reload=True)
+    # Enable reload only in local development
+    reload_mode = True if host == "127.0.0.1" else False
+    uvicorn.run("app.main:app", host=host, port=port, reload=reload_mode)
