@@ -665,12 +665,22 @@ function renderState(state) {
         // Highlight selected plan card
         for (const name of ['Fastest', 'Safest', 'Balanced']) {
             const card = document.getElementById(`card-${name}`);
-            if (name === dec.selected_plan) {
-                card.classList.add('selected');
-            } else {
-                card.classList.remove('selected');
+            if (card) {
+                if (name === dec.selected_plan) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
             }
         }
+    }
+
+    // 8. Disruption comparison rendering
+    if (state.disruption_event && state.original_decision && state.current_decision) {
+        renderReplanComparison(state, state.disruption_event);
+    } else {
+        if (replanComparisonCard) replanComparisonCard.classList.add('hidden');
+        if (replanEmptyCard) replanEmptyCard.classList.remove('hidden');
     }
 }
 
