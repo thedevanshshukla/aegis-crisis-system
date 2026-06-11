@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AEGIS: System Architecture & Agentic Orchestration</title>
+    <title>AEGIS: Enterprise Agentic Orchestration Architecture</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #070913;
-            --card-bg: rgba(13, 17, 34, 0.85);
-            --border-color: rgba(255, 255, 255, 0.08);
+            --bg-dark: #05070f;
+            --card-bg: rgba(10, 14, 28, 0.9);
+            --border-color: rgba(255, 255, 255, 0.06);
             
             --color-cyan: #00e5ff;
             --color-green: #00e676;
             --color-amber: #ffea00;
             --color-red: #ff1744;
             --color-purple: #d500f9;
-            --color-text: #e0e6ed;
-            --color-text-dim: #8892b0;
+            --color-text: #e2e8f0;
+            --color-text-dim: #718096;
             
             --font-outfit: 'Outfit', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
@@ -39,29 +39,29 @@
             min-height: 100vh;
             overflow-x: hidden;
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 229, 255, 0.03) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(213, 0, 249, 0.03) 0%, transparent 40%);
-            padding: 2rem;
+                radial-gradient(circle at 15% 15%, rgba(0, 229, 255, 0.02) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(213, 0, 249, 0.02) 0%, transparent 40%);
+            padding: 1.5rem;
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1720px;
             margin: 0 auto;
         }
 
         header {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1.5rem;
+            padding-bottom: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         h1 {
-            font-size: 2.2rem;
+            font-size: 2.1rem;
             font-weight: 800;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             background: linear-gradient(135deg, var(--color-cyan) 0%, #00b0ff 50%, var(--color-purple) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -69,31 +69,52 @@
 
         .subtitle {
             font-family: var(--font-mono);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--color-text-dim);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 5px;
+            margin-top: 4px;
         }
 
         .layout {
             display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 2rem;
-            min-height: calc(100vh - 180px);
+            grid-template-columns: 1fr 420px;
+            gap: 1.5rem;
+            min-height: calc(100vh - 160px);
         }
 
-        /* Flowchart Panel */
+/* Flowchart Panel */
         .flowchart-panel {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 2rem;
             position: relative;
             overflow: auto;
-            min-height: 650px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            min-height: 960px;
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.55);
             backdrop-filter: blur(16px);
+        }
+
+        /* Column Headers for Formal Architecture Layout */
+        .column-headers {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .column-header {
+            width: 200px;
+            text-align: center;
+            font-size: 0.7rem;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--color-text-dim);
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+            padding-bottom: 6px;
         }
 
         /* Node Styling */
@@ -106,55 +127,55 @@
         }
 
         .node {
-            background: rgba(18, 24, 48, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 1rem 1.5rem;
-            min-width: 200px;
+            background: rgba(12, 17, 35, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 0.8rem 1.2rem;
+            width: 190px;
             text-align: center;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
         .node:hover {
             border-color: var(--color-cyan);
-            box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
-            transform: translateY(-4px);
+            box-shadow: 0 0 18px rgba(0, 229, 255, 0.25);
+            transform: translateY(-2px);
         }
 
         .node.active {
             border-color: var(--color-purple) !important;
-            box-shadow: 0 0 25px rgba(213, 0, 249, 0.45) !important;
-            background: rgba(26, 21, 56, 0.95) !important;
+            box-shadow: 0 0 20px rgba(213, 0, 249, 0.4) !important;
+            background: rgba(22, 17, 46, 0.95) !important;
         }
 
         .node-title {
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.9rem;
             letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .node-type {
             font-family: var(--font-mono);
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--color-text-dim);
         }
 
         /* Node Colors */
-        .node-master .node { border-color: rgba(213, 0, 249, 0.4); background: rgba(30, 15, 50, 0.95); }
+        .node-master .node { border-color: rgba(213, 0, 249, 0.35); background: rgba(22, 13, 38, 0.95); }
         .node-master .node-title { color: var(--color-purple); }
         
-        .node-ingest .node { border-color: rgba(0, 229, 255, 0.4); }
+        .node-ingest .node { border-color: rgba(0, 229, 255, 0.35); }
         .node-ingest .node-title { color: var(--color-cyan); }
 
-        .node-core .node { border-color: rgba(0, 230, 118, 0.4); }
+        .node-core .node { border-color: rgba(0, 230, 118, 0.35); }
         .node-core .node-title { color: var(--color-green); }
 
-        .node-audit .node { border-color: rgba(255, 23, 68, 0.4); }
+        .node-audit .node { border-color: rgba(255, 23, 68, 0.35); }
         .node-audit .node-title { color: var(--color-red); }
 
         /* SVG Connections Overlay */
@@ -170,15 +191,15 @@
 
         .connection-line {
             fill: none;
-            stroke: rgba(255, 255, 255, 0.12);
-            stroke-width: 2;
-            transition: stroke 0.3s ease, stroke-width 0.3s ease;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 1.5;
+            transition: stroke 0.2s ease, stroke-width 0.2s ease;
         }
 
         .connection-line.highlight {
             stroke: var(--color-cyan);
-            stroke-width: 3;
-            filter: drop-shadow(0 0 4px var(--color-cyan));
+            stroke-width: 2.5;
+            filter: drop-shadow(0 0 3px var(--color-cyan));
         }
 
         /* Details Side Panel */
@@ -186,27 +207,27 @@
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 1.5rem;
+            padding: 1.2rem;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            gap: 1.2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
             backdrop-filter: blur(16px);
             height: 100%;
         }
 
         .detail-section-title {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: var(--color-text-dim);
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 6px;
-            margin-bottom: 8px;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .detail-text {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             line-height: 1.5;
             color: var(--color-text);
         }
@@ -215,22 +236,22 @@
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         .detail-badge {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 4px;
-            padding: 2px 6px;
-            font-size: 0.7rem;
+            padding: 2px 5px;
+            font-size: 0.65rem;
             font-family: var(--font-mono);
         }
 
         .future-badge {
-            border-color: rgba(213, 0, 249, 0.3);
+            border-color: rgba(213, 0, 249, 0.25);
             color: var(--color-purple);
-            background: rgba(213, 0, 249, 0.05);
+            background: rgba(213, 0, 249, 0.04);
         }
 
         .btn-back {
@@ -250,34 +271,49 @@
             color: var(--color-cyan);
         }
 
-        /* Positions of nodes manually set to form a grid */
-        #node-master { top: 30px; left: 450px; }
-        
-        /* Input/Ingestion Column */
-        #node-weather { top: 180px; left: 50px; }
-        #node-unrest { top: 290px; left: 50px; }
-        
-        /* Pipeline Flow */
-        #node-signal { top: 180px; left: 300px; }
-        #node-detection { top: 290px; left: 300px; }
-        #node-planner { top: 400px; left: 300px; }
-        
-        /* Auditing & Evaluation */
-        #node-validation { top: 400px; left: 600px; }
-        #node-memory { top: 290px; left: 600px; }
-        #node-evaluator { top: 180px; left: 600px; }
-        
-        /* Final Output */
-        #node-decision { top: 520px; left: 450px; }
-        #node-dispatch { top: 620px; left: 450px; }
+        /* 4-Column Layout Coordinates (Formal Grid) */
+        /* Header Orch */
+        #node-master { top: 40px; left: 460px; }
+
+        /* Col 1: Ingestion Layer (left: 40px) */
+        #node-weather { top: 120px; left: 40px; }
+        #node-unrest { top: 240px; left: 40px; }
+        #node-news { top: 360px; left: 40px; }
+        #node-satellite { top: 480px; left: 40px; }
+        #node-iot { top: 600px; left: 40px; }
+        #node-telecom { top: 720px; left: 40px; }
+
+        /* Col 2: Perception Layer (left: 320px) */
+        #node-signal { top: 180px; left: 320px; }
+        #node-detection { top: 300px; left: 320px; }
+        #node-geospatial { top: 420px; left: 320px; }
+        #node-acoustic { top: 540px; left: 320px; }
+        #node-anomaly { top: 660px; left: 320px; }
+
+        /* Col 3: Deliberation Layer (left: 600px) */
+        #node-planner { top: 110px; left: 600px; }
+        #node-validation { top: 210px; left: 600px; }
+        #node-feedback { top: 310px; left: 600px; }
+        #node-error-control { top: 410px; left: 600px; }
+        #node-memory { top: 510px; left: 600px; }
+        #node-evaluator { top: 610px; left: 600px; }
+        #node-risk-sim { top: 710px; left: 600px; }
+        #node-budget-opt { top: 810px; left: 600px; }
+
+        /* Col 4: Actuation Layer (left: 880px) */
+        #node-decision { top: 180px; left: 880px; }
+        #node-dispatch { top: 300px; left: 880px; }
+        #node-broadcast { top: 420px; left: 880px; }
+        #node-drone { top: 540px; left: 880px; }
+        #node-logistics { top: 660px; left: 880px; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <div>
-                <h1>AEGIS orchestration framework</h1>
-                <div class="subtitle">Agentic & Autonomous Decision Intelligence System Architecture</div>
+                <h1>AEGIS Orchestration Architecture</h1>
+                <div class="subtitle">Agentic & Autonomous System Deliberation Grid</div>
             </div>
             <button class="btn-back" onclick="window.close()">← Close Architecture</button>
         </header>
@@ -285,57 +321,118 @@
         <div class="layout">
             <!-- Flowchart Canvas -->
             <div class="flowchart-panel" id="canvas-container">
+                <div class="column-headers">
+                    <div class="column-header" style="position: absolute; left: 40px;">1. Ingestion Layer</div>
+                    <div class="column-header" style="position: absolute; left: 320px;">2. Perception Layer</div>
+                    <div class="column-header" style="position: absolute; left: 600px;">3. Deliberation Layer</div>
+                    <div class="column-header" style="position: absolute; left: 880px;">4. Actuation Layer</div>
+                </div>
+
                 <svg class="connections-svg" id="svg-canvas">
-                    <!-- Connections will be drawn dynamically -->
+                    <!-- Connections drawn dynamically -->
                 </svg>
 
                 <!-- ORCHESTRATOR -->
                 <div class="node-group node-master" id="node-master" data-node="master">
                     <div class="node">
                         <div class="node-title">MasterAgent</div>
-                        <div class="node-type">System Orchestrator</div>
+                        <div class="node-type">Global Orchestrator</div>
                     </div>
                 </div>
 
-                <!-- INPUT INGESTORS -->
+                <!-- LAYER 1: INGESTION -->
                 <div class="node-group node-ingest" id="node-weather" data-node="weather">
                     <div class="node">
-                        <div class="node-title">API weather stream</div>
-                        <div class="node-type">Input Ingestor</div>
+                        <div class="node-title">MeteorologyAgent</div>
+                        <div class="node-type">Weather API Stream</div>
                     </div>
                 </div>
                 <div class="node-group node-ingest" id="node-unrest" data-node="unrest">
                     <div class="node">
-                        <div class="node-title">News/Social Scraper</div>
-                        <div class="node-type">Input Ingestor</div>
+                        <div class="node-title">SocialSentimentAgent</div>
+                        <div class="node-type">Social Media Scraper</div>
+                    </div>
+                </div>
+                <div class="node-group node-ingest" id="node-news" data-node="news">
+                    <div class="node">
+                        <div class="node-title">NewsReaderAgent</div>
+                        <div class="node-type">RSS Feed Parser</div>
+                    </div>
+                </div>
+                <div class="node-group node-ingest" id="node-satellite" data-node="satellite">
+                    <div class="node">
+                        <div class="node-title">SatelliteRadarAgent</div>
+                        <div class="node-type">Earth Observation SAR</div>
+                    </div>
+                </div>
+                <div class="node-group node-ingest" id="node-iot" data-node="iot">
+                    <div class="node">
+                        <div class="node-title">IoTFloodingSensorAgent</div>
+                        <div class="node-type">Ultrasonic Water Gauges</div>
+                    </div>
+                </div>
+                <div class="node-group node-ingest" id="node-telecom" data-node="telecom">
+                    <div class="node">
+                        <div class="node-title">TelecomTrafficAgent</div>
+                        <div class="node-type">Cell Tower Density Ingestor</div>
                     </div>
                 </div>
 
-                <!-- PIPELINE PROCESSORS -->
+                <!-- LAYER 2: PERCEPTION -->
                 <div class="node-group node-core" id="node-signal" data-node="signal">
                     <div class="node">
                         <div class="node-title">SignalAgent</div>
-                        <div class="node-type">Cognitive Processor</div>
+                        <div class="node-type">Telemetry Normalizer</div>
                     </div>
                 </div>
                 <div class="node-group node-core" id="node-detection" data-node="detection">
                     <div class="node">
                         <div class="node-title">DetectionAgent</div>
-                        <div class="node-type">Cognitive Processor</div>
+                        <div class="node-type">Threat Assessor</div>
                     </div>
                 </div>
-                <div class="node-group node-core" id="node-planner" data-node="planner">
+                <div class="node-group node-core" id="node-geospatial" data-node="geospatial">
                     <div class="node">
-                        <div class="node-title">PlannerAgent</div>
-                        <div class="node-type">Cognitive Processor</div>
+                        <div class="node-title">GeospatialAgent</div>
+                        <div class="node-type">GIS Grid Vectorizer</div>
+                    </div>
+                </div>
+                <div class="node-group node-core" id="node-acoustic" data-node="acoustic">
+                    <div class="node">
+                        <div class="node-title">AcousticIncidentAgent</div>
+                        <div class="node-type">Audio Threat Monitor</div>
+                    </div>
+                </div>
+                <div class="node-group node-core" id="node-anomaly" data-node="anomaly">
+                    <div class="node">
+                        <div class="node-title">AnomalyDetectionAgent</div>
+                        <div class="node-type">ML Pattern Auditor</div>
                     </div>
                 </div>
 
-                <!-- AUDITING & EVALUATION -->
+                <!-- LAYER 3: DELIBERATION -->
+                <div class="node-group node-core" id="node-planner" data-node="planner">
+                    <div class="node">
+                        <div class="node-title">PlannerAgent</div>
+                        <div class="node-type">Strategy Generator</div>
+                    </div>
+                </div>
                 <div class="node-group node-audit" id="node-validation" data-node="validation">
                     <div class="node">
                         <div class="node-title">ValidationAgent</div>
                         <div class="node-type">Constraint Auditor</div>
+                    </div>
+                </div>
+                <div class="node-group node-audit" id="node-feedback" data-node="feedback">
+                    <div class="node">
+                        <div class="node-title">FeedbackAgent</div>
+                        <div class="node-type">Loop Updation Engine</div>
+                    </div>
+                </div>
+                <div class="node-group node-audit" id="node-error-control" data-node="error-control">
+                    <div class="node">
+                        <div class="node-title">ErrorControlAgent</div>
+                        <div class="node-type">Self-Correction Engine</div>
                     </div>
                 </div>
                 <div class="node-group node-audit" id="node-memory" data-node="memory">
@@ -347,11 +444,23 @@
                 <div class="node-group node-audit" id="node-evaluator" data-node="evaluator">
                     <div class="node">
                         <div class="node-title">EvaluatorAgent</div>
-                        <div class="node-type">Score Assessor</div>
+                        <div class="node-type">Aggregate Scorer</div>
+                    </div>
+                </div>
+                <div class="node-group node-audit" id="node-risk-sim" data-node="risk-sim">
+                    <div class="node">
+                        <div class="node-title">RiskSimulateAgent</div>
+                        <div class="node-type">Monte Carlo Simulator</div>
+                    </div>
+                </div>
+                <div class="node-group node-audit" id="node-budget-opt" data-node="budget-opt">
+                    <div class="node">
+                        <div class="node-title">BudgetOptimizerAgent</div>
+                        <div class="node-type">Cost Optimizer</div>
                     </div>
                 </div>
 
-                <!-- FINAL OUTPUT & ACTUATION -->
+                <!-- LAYER 4: ACTUATION -->
                 <div class="node-group node-master" id="node-decision" data-node="decision">
                     <div class="node">
                         <div class="node-title">DecisionAgent</div>
@@ -360,17 +469,36 @@
                 </div>
                 <div class="node-group node-master" id="node-dispatch" data-node="dispatch">
                     <div class="node">
-                        <div class="node-title">Action Dispatcher</div>
-                        <div class="node-type">Actuator Engine</div>
+                        <div class="node-title">DispatcherAgent</div>
+                        <div class="node-type">Asset Actuator</div>
+                    </div>
+                </div>
+                <div class="node-group node-master" id="node-broadcast" data-node="broadcast">
+                    <div class="node">
+                        <div class="node-title">BroadcastAgent</div>
+                        <div class="node-type">EAS Alert Injective</div>
+                    </div>
+                </div>
+                <div class="node-group node-master" id="node-drone" data-node="drone">
+                    <div class="node">
+                        <div class="node-title">AutonomousDroneAgent</div>
+                        <div class="node-type">Air Bridge Pilot</div>
+                    </div>
+                </div>
+                <div class="node-group node-master" id="node-logistics" data-node="logistics">
+                    <div class="node">
+                        <div class="node-title">LogisticsRouterAgent</div>
+                        <div class="node-type">Ground Convoy Driver</div>
                     </div>
                 </div>
             </div>
 
             <!-- Details Panel -->
             <div class="details-panel" id="details-panel">
-                <div style="text-align: center; margin-top: 5rem; color: var(--color-text-dim);">
-                    <p style="font-size: 1.5rem; margin-bottom: 1rem;">📐</p>
-                    <p>Click on any architectural node to view details on its connections, role, and main project scope.</p>
+                <div style="text-align: center; margin-top: 6rem; color: var(--color-text-dim);">
+                    <p style="font-size: 1.8rem; margin-bottom: 1rem;">📐</p>
+                    <p style="font-weight: 600; font-size: 0.95rem;">AEGIS Cognitive Deliberation Grid</p>
+                    <p style="font-size: 0.8rem; margin-top: 5px;">Select any orchestrator, ingestor, processor, or actuator node to inspect its autonomous role, active connections, and future production scope.</p>
                 </div>
             </div>
         </div>
@@ -380,125 +508,313 @@
         const nodesData = {
             master: {
                 title: "MasterAgent",
-                type: "System Orchestrator",
-                role: "The central core of the autonomous agentic framework. Coordinates sequential execution, manages global state, handles async loops, and triggers real-time replanning detours when environmental disruptions are detected.",
-                prototype: "Coordinates the mock execution timeline (Signal -> Detection -> Planner -> loops -> Memory -> Decision) and handles manual pausing/stepping.",
-                future: "Asynchronous orchestration thread pool running continuously on shared Redis state. Manages parallel agent execution threads, monitors health check heartbeats, and updates local postgres log tables.",
-                connections: "Binds to all nodes. Directs the workflow and updates the overall System State."
+                type: "Global System Orchestrator",
+                role: "The central nervous system of AEGIS. Operates as the parent state coordinator that initiates orchestration steps, handles asynchronous execution intervals, compiles audit alerts, and triggers immediate real-time replanning detours when a disruption signal is ingested.",
+                prototype: "Active Sandbox: Coordinates the sequential pipeline (Signal -> Detection -> Planner -> loops -> Memory -> Decision) and handles manual dashboard pause/resume commands.",
+                future: "Enterprise-scale daemon running on async Python thread pool utilizing Redis pub/sub. Dynamically routes task logs to a PostgreSQL database and exposes WebSocket event heartbeats.",
+                connections: "Supervises and coordinates all agents across the pipeline."
             },
             weather: {
-                title: "API Weather Feeds",
-                type: "Input Ingestor",
-                role: "An automated external ingestion layer designed to feed real-time environmental data streams directly into the decision pipelines.",
-                prototype: "Ingests preset rainfall rates (mm/h) and water level estimates (meters) depending on the selected Scenario Variant (A/B/C).",
-                future: "Live external integrations with NOAA, OpenWeatherMap APIs, and IoT water level sensors located along vulnerable rivers to fetch real-time indicators every 60 seconds.",
-                connections: "Feeds normalized water and rainfall metrics to the SignalAgent."
+                title: "MeteorologyAgent",
+                type: "Weather API Stream Ingestor",
+                role: "Autonomous ingestion stream that queries external environmental servers, monitors geological storm indicators, and pushes real-time precipitation variables into the ingestion buffer.",
+                prototype: "Active Sandbox (Simulated): Mapped incident telemetry generated dynamically based on selected Scenario Variant (Rainfall & Water Levels).",
+                future: "Continuous API integrations with open weather networks, local river telemetry sensors, and meteorological radar grids to update data values every 30 seconds.",
+                connections: "Pushes raw weather data directly to the SignalAgent."
             },
             unrest: {
-                title: "News & Social Scraper",
-                type: "Input Ingestor",
-                role: "Autonomous ingestion stream that monitors crowd unrest, social strikes, and incident anomalies to alert local dispatchers.",
-                prototype: "Simulates crowd size and unrest indices (0 to 100) based on selected presets, with manual injections like Bridge Collapse or Riot Outbreak.",
-                future: "Active web scrapers connecting to the X (Twitter) API, local news RSS feeds, and Reddit forums to extract real-time crowd agitation, public sentiment, and geological news spikes using LLM parsing.",
-                connections: "Feeds normalized unrest indices and disruption markers to the SignalAgent."
+                title: "SocialSentimentAgent",
+                type: "Social Media Scraper Ingestor",
+                role: "Pulls crowd agitation telemetry and social sentiment indicators, analyzing civil unrest variables to alert the system of public safety threats.",
+                prototype: "Active Sandbox (Simulated): Civil unrest indices simulated based on selected Scenario Variant.",
+                future: "Asynchronous social scraping pipeline processing local geo-fenced comments and forum posts using LLM-driven keyword classification to detect flash mobs and protests.",
+                connections: "Sends social telemetry data to the SignalAgent."
+            },
+            news: {
+                title: "NewsReaderAgent",
+                type: "News RSS Ingestor",
+                role: "Monitors online emergency feeds, news alerts, and police dispatch logs using text parsing to detect environmental or structural anomalies.",
+                prototype: "Active Sandbox (Simulated): Feeds incident parameters upon user disruption clicks (Bridge Collapse, Riot, etc.).",
+                future: "Scrapes police scanner texts and local press RSS feeds to flag structural failures (bridge collapses, blocked highways) immediately as they are reported.",
+                connections: "Feeds incident alerts to the SignalAgent."
+            },
+            satellite: {
+                title: "SatelliteRadarAgent",
+                type: "Earth Observation SAR Ingestor",
+                role: "Queries satellite synthetic aperture radar (SAR) imagery to monitor flood boundary expansion, surface wetness indices, and road blockage vectors.",
+                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
+                future: "Automated queries to Sentinel/Landsat image repositories to vector hazard maps.",
+                connections: "Pushes raw imaging indicators to SignalAgent."
+            },
+            iot: {
+                title: "IoTFloodingSensorAgent",
+                type: "IoT River Telemetry Monitor",
+                role: "Ingests continuous streams from physical ultrasonic water level sensors installed at major bridges and river bends.",
+                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
+                future: "Direct MQTT broker listener connecting to physical solar-powered telemetry sensors.",
+                connections: "Sends raw river water level levels to SignalAgent."
+            },
+            telecom: {
+                title: "TelecomTrafficAgent",
+                type: "Cell Density & Traffic Ingestor",
+                role: "Monitors anonymized cellular tower connection density to identify traffic jams and high-risk crowd gatherings during evacuations.",
+                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
+                future: "Secure API connection with telecom base stations to parse spatial device coordinates.",
+                connections: "Feeds network congestion data to SignalAgent."
             },
             signal: {
                 title: "SignalAgent",
-                type: "Cognitive Processor",
-                role: "Receives raw environmental and social feeds, filters noise, normalizes metrics, and maps coordinates to prepare data structures for threat detection.",
-                prototype: "Maps simple rainfall and unrest variables to TaskState.",
-                future: "Geospatial vector mapping, aligning localized IoT sensors with sector zones on GIS coordinates.",
-                connections: "Receives feeds from Ingestors; feeds normalized variables to DetectionAgent."
+                type: "Telemetry Normalizer",
+                role: "Receives raw feeds from all three ingestors, filters noise, maps input matrices, and normalizes variables into standard floats for subsequent threat computations.",
+                prototype: "Active Sandbox: Pushes simple normalized rainfall and unrest metrics to TaskState.",
+                future: "Data cleaning and vector alignment system translating raw unstructured sensor logs into clean geospatial JSON matrices.",
+                connections: "Normalizes Ingestion data; feeds clean telemetry to DetectionAgent."
             },
             detection: {
                 title: "DetectionAgent",
-                type: "Cognitive Processor",
-                role: "Calculates the multi-hazard severity index, detects limit breaches, and escalates the Alert State (Green, Amber, Red) based on predefined risk curves.",
-                prototype: "Computes a static threat severity index using standard hazard thresholds.",
-                future: "LSTM-based predictive threat curve forecasting, predicting river breaches and crowd escalation indices 3 hours before they happen.",
-                connections: "Receives inputs from SignalAgent; triggers alert signals to MasterAgent."
+                type: "Threat Assessor",
+                role: "Analyzes incoming variables, computes a normalized Crisis Severity Index, evaluates safety thresholds, and escalates the global Alert State (Green, Amber, Red).",
+                prototype: "Active Sandbox: Determines threat levels based on simple static threshold calculations.",
+                future: "Predictive neural networks running threat forecast algorithms to predict flash floods and protest escalation hours before they manifest in the field.",
+                connections: "Receives normalized signals; alerts MasterAgent and GeospatialAgent."
+            },
+            geospatial: {
+                title: "GeospatialAgent",
+                type: "GIS Grid Vectorizer",
+                role: "Maps active hazard variables (flood vectors, riot coordinates) onto standard GIS grids to identify blocked transit corridors and safe evacuation sectors.",
+                prototype: "Active Sandbox (Simulated): Renders sector hazard maps on static dashboard cards.",
+                future: "Integration with map server APIs (e.g. ArcGIS, Mapbox) to dynamically recalculate available evacuation roads and safety cordons.",
+                connections: "Receives inputs from DetectionAgent; sends grid vector matrices to PlannerAgent."
+            },
+            acoustic: {
+                title: "AcousticIncidentAgent",
+                type: "Audio Threat Detector",
+                role: "Monitors emergency sirens, gunshots, and localized crowd decibel spikes using edge acoustic processing.",
+                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
+                future: "Audio classification neural network deploying on local smart microphones.",
+                connections: "Pushes acoustic alert states to DetectionAgent."
+            },
+            anomaly: {
+                title: "AnomalyDetectionAgent",
+                type: "ML Pattern Auditor",
+                role: "Scans normalized data streams for abnormal spikes or divergence from baseline safety expectations.",
+                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
+                future: "LSTM/Autoencoder models auditing sensor drift or sudden environmental shocks.",
+                connections: "Alerts DetectionAgent of anomalous sensor spikes."
             },
             planner: {
                 title: "PlannerAgent",
-                type: "Cognitive Processor",
-                role: "Drafts multiple alternative evacuation and safety plans (Fastest, Safest, Balanced) based on active resource parameters.",
-                prototype: "Returns 3 structured plan presets using standard descriptions, costs, durations, and steps.",
-                future: "Active GPT-4/Claude LLM calls generating custom action sequences, resource allocation tables, and customized step durations in real-time based on the exact telemetry profile.",
-                connections: "Receives inputs from DetectionAgent; passes drafted plans to ValidationAgent."
+                type: "Strategy Generator",
+                role: "Drafts multiple alternate evacuation and response paths (Fastest, Safest, Balanced), defining resource requirements, durations, and population coverage percentages.",
+                prototype: "Active Sandbox: Returns 3 strategy variants containing predefined steps.",
+                future: "Direct LLM calls generating custom action paths, cost estimates, and equipment logs in real-time based on the exact crisis signature.",
+                connections: "Drafts initial strategies; receives adjustment prompts from FeedbackAgent; passes plans to ValidationAgent."
             },
             validation: {
                 title: "ValidationAgent",
                 type: "Constraint Auditor",
-                role: "Audits plans against hard constraints (e.g. max budget limits, safety risk limits, and escort requirements) and flags compliance failures.",
-                prototype: "Enforces a $220k budget ceiling, risk limit of 4.0, and checks for tactical escorts when unrest exceeds 70%. Triggers a correction loop back to the planner on failure.",
-                future: "Complex legal rule compliance engine mapping state evacuation rules, military protocols, and real-time helicopter wind limits.",
-                connections: "Audits output from PlannerAgent; loops back to Planner on failure; passes verified plans to MemoryAgent."
+                role: "Performs strict rule audits on all drafted plans against boundary conditions (such as the $220k budget ceiling, safety risk maximum of 4.0, and escort requirements in high-unrest sectors).",
+                prototype: "Active Sandbox: Flags budget and safety violations, and logs failure reports in state.validation.",
+                future: "Formal compliance verification engine mapping legal emergency mandates, airspace limits, and resource capacity graphs.",
+                connections: "Audits plans from PlannerAgent; sends failure logs to FeedbackAgent; passes compliant plans to MemoryAgent."
+            },
+            feedback: {
+                title: "FeedbackAgent",
+                type: "Loop Updation Engine",
+                role: "Formulates plan adjustments and prompts based on constraint failures, low scores, or human guidance to optimize candidate strategies.",
+                prototype: "Active Sandbox (Simulated): Self-optimization loops are handled inline by the MasterAgent to refine PlannerAgent parameters.",
+                future: "Self-contained closed-loop LLM prompt manager translating audit violations into precise corrective prompts to achieve perfect compliance.",
+                connections: "Receives constraint/score feedback; directs update prompts to PlannerAgent."
+            },
+            "error-control": {
+                title: "ErrorControlAgent",
+                type: "Self-Correction & Learning Engine",
+                role: "Monitors execution exceptions, agent failure responses, and state drift. Dynamically corrects code-level parameters or re-calibrates logic to recover from failures.",
+                prototype: "Future Enterprise Target: Exceptions and boundaries handled by MasterAgent timeout and validation safeguards.",
+                future: "An AI coding sub-agent capable of patching local configuration thresholds and recovery pathways at runtime when an exception is intercepted.",
+                connections: "Intercepts runtime errors; applies logic adjustments to Deliberation Layer."
             },
             memory: {
                 title: "MemoryAgent",
                 type: "Precedent Library",
-                role: "Queries historical case databases, calculates vector similarity distances relative to current crisis parameters, and retrieves matching outcomes to recommend strategies.",
-                prototype: "Compares current metrics against 3 historic crisis cases (CASE-101, 102, 103), boosting matching plan scores by +5.0 points.",
-                future: "Vector databases (like Pinecone/Milvus) storing thousands of global disaster outcomes, providing advanced case-based retrieval.",
-                connections: "Receives audited plans; updates plan scores with memory boosts; feeds to EvaluatorAgent."
+                role: "Retrieves historical emergency records from the experience library, computes vector similarity to current parameters, and applies empirical score boosts to historically proven strategies.",
+                prototype: "Active Sandbox: Compares current telemetry against CASE-101, 102, and 103, applying a +5.0 point aggregate boost to matching plans.",
+                future: "Vector database search engine (e.g. Qdrant/Pinecone) mapping historical disaster incident vectors to quickly pull outcomes from similar global operations.",
+                connections: "Ingests valid plans; applies historical precedent boosts; passes modified plans to EvaluatorAgent."
             },
             evaluator: {
                 title: "EvaluatorAgent",
-                type: "Score Assessor",
-                role: "Performs multi-criteria assessment of all valid plans using weighted variables (e.g., speed, safety, cost, population coverage).",
-                prototype: "Calculates aggregate scores mathematically using weights defined in config.",
-                future: "LLM-driven qualitative scoring matching environmental variables and historical efficiency metrics.",
-                connections: "Receives boosted evaluations; calculates final score matrix; feeds to DecisionAgent."
+                type: "Aggregate Scorer",
+                role: "Conducts multi-criteria evaluation of all valid strategies, calculating a weighted aggregate performance score (reflecting speed, cost, safety, and coverage weights).",
+                prototype: "Active Sandbox: Calculates scores mathematically using standard config weights.",
+                future: "Dynamic scoring algorithm adjusting weights based on system constraints (e.g. prioritizing speed over cost if water levels escalate rapidly).",
+                connections: "Scores plans; compiles performance matrices; feeds to DecisionAgent."
+            },
+            "risk-sim": {
+                title: "RiskSimulateAgent",
+                type: "Monte Carlo Risk Simulator",
+                role: "Runs thousands of simulated variants of each action plan against chaotic parameters to calculate statistical survival and success indexes.",
+                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
+                future: "Distributed compute cluster running dynamic simulations for plan risk analysis.",
+                connections: "Ingests plans; feeds evaluated risk indices to EvaluatorAgent."
+            },
+            "budget-opt": {
+                title: "BudgetOptimizerAgent",
+                type: "Cost Efficiency Optimizer",
+                role: "Analyzes resource allocation plans to find cost-saving alternatives, maximizing resource usage efficiency under the budget ceiling.",
+                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
+                future: "Linear programming solvers optimizing resource-to-task assignment matrices.",
+                connections: "Feeds cost-efficiency indices to EvaluatorAgent."
             },
             decision: {
                 title: "DecisionAgent",
                 type: "Resolution Engine",
-                role: "Final arbiter of the system. Resolves rankings, selected optimal recommendations, explains rejected alternatives, and drafts fallback instructions if all plans fail validation.",
-                prototype: "Invokes mock LLM to rank the plans, justify choice, and supply fallback escalation text under Variant C.",
-                future: "Multi-modal deliberative LLM agent analyzing live drone feeds, budget spreadsheets, and compliance audits to generate comprehensive mission briefings and explainability reports.",
-                connections: "Receives final scoring matrix; publishes recommendation; feeds to Action Dispatcher."
+                role: "The final cognitive resolution module. Decides the optimal strategy, ranks the leaderboard, documents rejected plans with explainable justifications, and triggers fallback escalations if all options breach limits.",
+                prototype: "Active Sandbox: Invokes mock LLM to resolve plan rankings, confidence metrics, and fallback alerts.",
+                future: "Deliberative multi-model agent generating comprehensive, human-readable mission briefs, explainability reports, and risk checklists for command centers.",
+                connections: "Selects optimal strategy; maps leaderboard; feeds choice to DispatcherAgent."
             },
             dispatch: {
-                title: "Action Dispatcher",
-                type: "Actuator Engine",
-                role: "Translates the recommended strategy into physical actions, triggers warning dispatch systems, and allocates rescue assets.",
-                prototype: "Displays selected strategy and step details on the dashboard UI.",
-                future: "Automated API warning alerts (SMS/EAS broadcast), triggers smart contracts for emergency budget release, and dispatches GPS waypoint routes to autonomous drones and emergency vehicles.",
-                connections: "Receives recommendation from DecisionAgent; executes actions in the environment."
+                title: "DispatcherAgent",
+                type: "Asset Actuator",
+                role: "Translates the resolved digital strategy into actionable dispatch instructions, allocating tactical police squads, civil transport buses, and medical assets.",
+                prototype: "Active Sandbox (Simulated): Renders step details of the selected optimal plan on the dashboard UI.",
+                future: "Real-time dispatch system integrated with emergency vehicle GPS trackers, automated drone autopilots, and resource logistics databases.",
+                connections: "Ingests choice from DecisionAgent; executes actions; triggers BroadcastAgent."
+            },
+            broadcast: {
+                title: "BroadcastAgent",
+                type: "EAS Alert Actuator",
+                role: "Dispatches warnings to the general public, broadcasts emergency EAS signals, and updates digital road sign vectors in the affected sectors.",
+                prototype: "Active Sandbox (Simulated): Displays status text updates on the frontend dashboard.",
+                future: "Integration with national emergency broadcast APIs (EAS, FEMA IPAWS) and cellular SMS alert systems to push localized safety warnings.",
+                connections: "Receives alerts from DispatcherAgent; pushes warnings to the public."
+            },
+            drone: {
+                title: "AutonomousDroneAgent",
+                type: "Aerial Dispatch Coordinator",
+                role: "Coordinates flight paths for rescue drones, aerial bridge drops, and visual surveillance feeds in flooded or blocked corridors.",
+                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
+                future: "Autonomous UAS traffic management (UTM) platform dispatching long-range UAVs.",
+                connections: "Receives directives from DispatcherAgent; deploys aerial assets."
+            },
+            logistics: {
+                title: "LogisticsRouterAgent",
+                type: "Convoy Routing Engine",
+                role: "Dynamically routes ground assets, supply trucks, and military convoy escorts through safe geo-zones.",
+                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
+                future: "Continuous dynamic routing engine integrated with live traffic data and blockages.",
+                connections: "Receives directives from DispatcherAgent; schedules ground logistics routes."
             }
         };
 
-        // Draw connections
+        // Graph connections (100% formal, orthogonal routing)
         const connections = [
-            { from: 'node-master', to: 'node-signal' },
+            // Ingestion to Signal
             { from: 'node-weather', to: 'node-signal' },
             { from: 'node-unrest', to: 'node-signal' },
+            { from: 'node-news', to: 'node-signal' },
+            { from: 'node-satellite', to: 'node-signal' },
+            { from: 'node-iot', to: 'node-signal' },
+            { from: 'node-telecom', to: 'node-signal' },
+            
+            // Perception sequence
             { from: 'node-signal', to: 'node-detection' },
-            { from: 'node-detection', to: 'node-planner' },
+            { from: 'node-detection', to: 'node-geospatial' },
+            { from: 'node-acoustic', to: 'node-detection' },
+            { from: 'node-anomaly', to: 'node-detection' },
+            
+            // Deliberation Core sequence
+            { from: 'node-geospatial', to: 'node-planner' },
             { from: 'node-planner', to: 'node-validation' },
-            { from: 'node-validation', to: 'node-planner', loop: true }, // loop back
+            
+            // Core Updation/Feedback Loops
+            { from: 'node-validation', to: 'node-feedback' },
+            { from: 'node-feedback', to: 'node-planner', loop: true }, // Loop back
+            { from: 'node-validation', to: 'node-error-control' },
+            { from: 'node-error-control', to: 'node-planner', loop: true }, // Loop back
+            
+            // Deliberation to Evaluation
             { from: 'node-validation', to: 'node-memory' },
             { from: 'node-memory', to: 'node-evaluator' },
+            
+            // Evaluator to specialized optimizers
+            { from: 'node-evaluator', to: 'node-risk-sim' },
+            { from: 'node-evaluator', to: 'node-budget-opt' },
+            
+            // Evaluation to Actuation
             { from: 'node-evaluator', to: 'node-decision' },
-            { from: 'node-decision', to: 'node-dispatch' }
+            { from: 'node-decision', to: 'node-dispatch' },
+            { from: 'node-dispatch', to: 'node-broadcast' },
+            { from: 'node-dispatch', to: 'node-drone' },
+            { from: 'node-dispatch', to: 'node-logistics' }
         ];
+
+        // Global Orchestrator lines (Draw from Master to other nodes)
+        const orchestratorTargets = [
+            'node-signal', 
+            'node-planner', 
+            'node-validation', 
+            'node-feedback', 
+            'node-error-control', 
+            'node-decision', 
+            'node-dispatch'
+        ];
+
+        function getIntersectionPoint(fromRect, toRect, canvasRect) {
+            const fromX = fromRect.left - canvasRect.left;
+            const fromY = fromRect.top - canvasRect.top;
+            const toX = toRect.left - canvasRect.left;
+            const toY = toRect.top - canvasRect.top;
+
+            let x1, y1, x2, y2;
+
+            if (fromX < toX) {
+                // Horizontal left-to-right
+                x1 = fromX + fromRect.width;
+                y1 = fromY + fromRect.height / 2;
+                x2 = toX;
+                y2 = toY + toRect.height / 2;
+            } else if (fromX > toX) {
+                // Horizontal right-to-left
+                x1 = fromX;
+                y1 = fromY + fromRect.height / 2;
+                x2 = toX + toRect.width;
+                y2 = toY + toRect.height / 2;
+            } else {
+                // Same column vertical
+                x1 = fromX + fromRect.width / 2;
+                x2 = toX + toRect.width / 2;
+                if (fromY < toY) {
+                    y1 = fromY + fromRect.height;
+                    y2 = toY;
+                } else {
+                    y1 = fromY;
+                    y2 = toY + toRect.height;
+                }
+            }
+
+            return { x1, y1, x2, y2 };
+        }
 
         function drawConnections() {
             const svg = document.getElementById('svg-canvas');
-            svg.innerHTML = ''; // Clear previous
+            svg.innerHTML = ''; // Clear
 
-            // Add arrow markers
             const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
             defs.innerHTML = `
-                <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                    <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(255,255,255,0.4)" />
+                <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(255,255,255,0.25)" />
                 </marker>
-                <marker id="arrow-highlight" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <marker id="arrow-highlight" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
                     <path d="M 0 0 L 10 5 L 0 10 z" fill="#00e5ff" />
                 </marker>
             `;
             svg.appendChild(defs);
 
+            const canvasRect = document.getElementById('canvas-container').getBoundingClientRect();
+
+            // 1. Draw sequential data connections
             connections.forEach((conn, index) => {
                 const fromEl = document.getElementById(conn.from);
                 const toEl = document.getElementById(conn.to);
@@ -507,34 +823,32 @@
 
                 const fromRect = fromEl.getBoundingClientRect();
                 const toRect = toEl.getBoundingClientRect();
-                const canvasRect = document.getElementById('canvas-container').getBoundingClientRect();
 
-                // Compute local coordinates relative to the canvas container
-                const x1 = (fromRect.left - canvasRect.left) + fromRect.width / 2;
-                const y1 = (fromRect.top - canvasRect.top) + fromRect.height / 2;
-                const x2 = (toRect.left - canvasRect.left) + toRect.width / 2;
-                const y2 = (toRect.top - canvasRect.top) + toRect.height / 2;
+                const { x1, y1, x2, y2 } = getIntersectionPoint(fromRect, toRect, canvasRect);
 
                 const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                
                 let dStr = "";
+
                 if (conn.loop) {
-                    // Loop line (Validation -> Planner curve)
-                    const controlX = (x1 + x2) / 2 + 100;
-                    const controlY = (y1 + y2) / 2 + 80;
-                    dStr = `M ${x1} ${y1} Q ${controlX} ${controlY} ${x2} ${y2}`;
+                    // Loop back from Col 3 back to Planner in Col 3
+                    const startX = fromRect.left - canvasRect.left;
+                    const startY = fromRect.top - canvasRect.top + fromRect.height / 2;
+                    const endX = toRect.left - canvasRect.left;
+                    const endY = toRect.top - canvasRect.top + toRect.height / 2;
+                    
+                    const loopX = startX - 45; // corridor back
+                    dStr = `M ${startX} ${startY} H ${loopX} V ${endY} H ${endX}`;
+                } else if (Math.abs(x1 - x2) > 40) {
+                    // Different columns (orthogonal corridor routing)
+                    let midX = (x1 + x2) / 2;
+                    if (x1 < 200 && x2 > 300) midX = 275;      // Corridor 1 (Col 1 to Col 2)
+                    else if (x1 < 500 && x2 > 580) midX = 555; // Corridor 2 (Col 2 to Col 3)
+                    else if (x1 < 780 && x2 > 860) midX = 835; // Corridor 3 (Col 3 to Col 4)
+                    
+                    dStr = `M ${x1} ${y1} H ${midX} V ${y2} H ${x2}`;
                 } else {
-                    // Straight or orthogonal line
-                    if (conn.from === 'node-weather' || conn.from === 'node-unrest') {
-                        // Inflow bends
-                        dStr = `M ${x1 + fromRect.width/2} ${y1} L ${x2 - toRect.width/2} ${y2}`;
-                    } else if (conn.from === 'node-master') {
-                        // Master controls down
-                        dStr = `M ${x1} ${y1 + fromRect.height/2} L ${x1} ${y2 - toRect.height/2}`;
-                    } else {
-                        // Standard sequential flows
-                        dStr = `M ${x1} ${y1} L ${x2} ${y2}`;
-                    }
+                    // Same column (direct vertical line)
+                    dStr = `M ${x1} ${y1} L ${x2} ${y2}`;
                 }
 
                 path.setAttribute("d", dStr);
@@ -543,54 +857,98 @@
                 path.setAttribute("marker-end", "url(#arrow)");
                 svg.appendChild(path);
             });
+
+            // 2. Draw global orchestrator commands from MasterAgent (dashed purple lines)
+            const masterEl = document.getElementById('node-master');
+            if (masterEl) {
+                const masterRect = masterEl.getBoundingClientRect();
+                const mX = (masterRect.left - canvasRect.left) + masterRect.width / 2;
+                const mY = (masterRect.top - canvasRect.top) + masterRect.height;
+
+                orchestratorTargets.forEach((targetId) => {
+                    const targetEl = document.getElementById(targetId);
+                    if (!targetEl) return;
+                    const tRect = targetEl.getBoundingClientRect();
+                    const tX_left = tRect.left - canvasRect.left;
+                    const tX_right = tX_left + tRect.width;
+                    const tY_center = (tRect.top - canvasRect.top) + tRect.height / 2;
+                    const tY_top = tRect.top - canvasRect.top;
+
+                    let dStr = "";
+                    const isTopNode = (targetId === 'node-signal' || targetId === 'node-planner' || targetId === 'node-decision');
+                    
+                    if (isTopNode) {
+                        const targetX = tX_left + tRect.width / 2;
+                        dStr = `M ${mX} ${mY} V 90 H ${targetX} V ${tY_top}`;
+                    } else {
+                        let corrX = 555;
+                        let entryX = tX_left;
+                        if (targetId.includes('dispatch') || targetId.includes('broadcast') || targetId.includes('drone') || targetId.includes('logistics')) {
+                            corrX = 835;
+                        }
+                        dStr = `M ${mX} ${mY} V 90 H ${corrX} V ${tY_center} H ${entryX}`;
+                    }
+
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    path.setAttribute("d", dStr);
+                    path.setAttribute("class", "connection-line");
+                    path.setAttribute("style", "stroke: rgba(213, 0, 249, 0.2); stroke-dasharray: 4,4; fill: none;");
+                    svg.appendChild(path);
+                });
+            }
         }
 
-        // Handle Details Panel rendering
         function showNodeDetails(nodeId) {
             const data = nodesData[nodeId];
             if (!data) return;
 
-            // Update active state on nodes
+            // Highlight node
             document.querySelectorAll('.node-group').forEach(el => el.querySelector('.node').classList.remove('active'));
-            document.getElementById(`node-${nodeId}`).querySelector('.node').classList.add('active');
+            const nodeEl = document.getElementById(`node-${nodeId}`);
+            if (nodeEl) nodeEl.querySelector('.node').classList.add('active');
 
             const panel = document.getElementById('details-panel');
             panel.innerHTML = `
                 <div>
-                    <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--color-cyan); margin-bottom: 4px;">${data.title}</h2>
-                    <div class="subtitle" style="margin-bottom: 1rem;">${data.type}</div>
+                    <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--color-cyan); margin-bottom: 2px;">${data.title}</h2>
+                    <div class="subtitle" style="margin-bottom: 0.8rem;">${data.type}</div>
                     
-                    <div class="detail-section-title">Cognitive Role</div>
+                    <div class="detail-section-title">Cognitive Role & Actuation</div>
                     <p class="detail-text">${data.role}</p>
                 </div>
 
                 <div>
-                    <div class="detail-section-title">Current Prototype Scope</div>
+                    <div class="detail-section-title">Current Sandbox Scope</div>
                     <p class="detail-text" style="color: var(--color-text-dim);">${data.prototype}</p>
                     <div class="detail-badge-group">
-                        <span class="detail-badge">In-Memory Sandbox</span>
-                        <span class="detail-badge">Deterministic</span>
+                        <span class="detail-badge">Deterministic Rules</span>
+                        <span class="detail-badge">In-Memory State</span>
                     </div>
                 </div>
 
                 <div>
-                    <div class="detail-section-title">Production & Future Scope</div>
-                    <p class="detail-text" style="border-left: 2px solid var(--color-purple); padding-left: 10px;">${data.future}</p>
+                    <div class="detail-section-title">Production & Future Project Scope</div>
+                    <p class="detail-text" style="border-left: 2px solid var(--color-purple); padding-left: 10px; color: #f0f4f8;">${data.future}</p>
                     <div class="detail-badge-group">
-                        <span class="detail-badge future-badge">Live API Feeds</span>
-                        <span class="detail-badge future-badge">AI LLM Pipeline</span>
-                        <span class="detail-badge future-badge">Async Parallel</span>
+                        <span class="detail-badge future-badge">Independent Agent</span>
+                        <span class="detail-badge future-badge">Closed-Loop AI</span>
+                        <span class="detail-badge future-badge">Continuous Scraper</span>
                     </div>
                 </div>
 
                 <div>
-                    <div class="detail-section-title">Execution Connections</div>
-                    <p class="detail-text font-mono" style="font-size: 0.8rem; color: var(--color-cyan);">${data.connections}</p>
+                    <div class="detail-section-title">Graph Connections</div>
+                    <p class="detail-text font-mono" style="font-size: 0.75rem; color: var(--color-cyan);">${data.connections}</p>
                 </div>
             `;
 
-            // Highlight connection lines
-            document.querySelectorAll('.connection-line').forEach(line => line.classList.remove('highlight'));
+            // Highlight connection paths
+            document.querySelectorAll('.connection-line').forEach(line => {
+                if (!line.getAttribute("style")) { // Don't wipe dashed lines
+                    line.classList.remove('highlight');
+                    line.setAttribute("marker-end", "url(#arrow)");
+                }
+            });
             connections.forEach((conn, index) => {
                 if (conn.from === `node-${nodeId}` || conn.to === `node-${nodeId}`) {
                     const line = document.getElementById(`line-${index}`);
@@ -598,16 +956,11 @@
                         line.classList.add('highlight');
                         line.setAttribute("marker-end", "url(#arrow-highlight)");
                     }
-                } else {
-                    const line = document.getElementById(`line-${index}`);
-                    if (line) {
-                        line.setAttribute("marker-end", "url(#arrow)");
-                    }
                 }
             });
         }
 
-        // Event Listeners
+        // Add event listeners
         document.querySelectorAll('.node-group').forEach(el => {
             el.addEventListener('click', () => {
                 const nodeKey = el.getAttribute('data-node');
@@ -615,13 +968,12 @@
             });
         });
 
-        // Initialize Canvas
         window.addEventListener('load', () => {
             drawConnections();
-            // Default select orchestrator
-            showNodeDetails('master');
+            // Default select feedback node
+            showNodeDetails('feedback');
         });
-        
+
         window.addEventListener('resize', drawConnections);
     </script>
 </body>
