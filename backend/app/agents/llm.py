@@ -257,21 +257,16 @@ class LLMService:
                 score_factor = 0.79
                 past_success_factor = 0.95
 
-            # Dynamic ranking sorted by actual aggregate score
-            plan_scores = [
-                ("Fastest", score_fast),
-                ("Safest", score_safe),
-                ("Balanced", score_bal)
+            # The selected plan must always be Rank 1 on the leaderboard
+            other_plans = [p for p in ["Fastest", "Safest", "Balanced"] if p != selected]
+            # Sort the remaining plans by their scores descending
+            other_plans.sort(key=lambda p: score_fast if p == "Fastest" else (score_safe if p == "Safest" else score_bal), reverse=True)
+
+            ranking = [
+                {"plan": selected, "score": score_safe if selected == "Safest" else (score_bal if selected == "Balanced" else score_fast), "rank": 1},
+                {"plan": other_plans[0], "score": score_safe if other_plans[0] == "Safest" else (score_bal if other_plans[0] == "Balanced" else score_fast), "rank": 2},
+                {"plan": other_plans[1], "score": score_safe if other_plans[1] == "Safest" else (score_bal if other_plans[1] == "Balanced" else score_fast), "rank": 3}
             ]
-            plan_scores.sort(key=lambda x: x[1], reverse=True)
-            
-            ranking = []
-            for rank_idx, (name, score) in enumerate(plan_scores):
-                ranking.append({
-                    "plan": name,
-                    "score": score,
-                    "rank": rank_idx + 1
-                })
 
             decision_payload = {
                 "status": "completed",
