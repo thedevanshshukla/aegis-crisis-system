@@ -257,7 +257,8 @@ async function togglePauseResume() {
         }
         
         const response = await fetch(`${API_BASE}${endpoint}`, { method: 'POST' });
-        const state = await response.json();
+        const data = await response.json();
+        const state = data.state;
         
         renderState(state);
         startPolling();
@@ -270,7 +271,8 @@ async function togglePauseResume() {
 async function stopExecution() {
     try {
         const response = await fetch(`${API_BASE}/stop`, { method: 'POST' });
-        const state = await response.json();
+        const data = await response.json();
+        const state = data.state;
         stopPolling();
         renderState(state);
         updateControlsForCompletedState(state);
@@ -299,7 +301,8 @@ async function injectDisruption(eventType) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ event_type: eventType })
         });
-        const state = await response.json();
+        const data = await response.json();
+        const state = data.state;
         
         renderState(state);
         renderReplanComparison(state, eventType);
