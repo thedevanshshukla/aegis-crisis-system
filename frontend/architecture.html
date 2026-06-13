@@ -77,13 +77,12 @@
         }
 
         .layout {
-            display: grid;
-            grid-template-columns: 1fr 420px;
-            gap: 1.5rem;
+            display: block; /* Flowchart occupies full width */
             min-height: calc(100vh - 160px);
+            position: relative;
         }
 
-/* Flowchart Panel */
+        /* Flowchart Panel */
         .flowchart-panel {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -178,6 +177,57 @@
         .node-audit .node { border-color: rgba(255, 23, 68, 0.35); }
         .node-audit .node-title { color: var(--color-red); }
 
+        /* Visually separate layers: Core vs Others */
+        .node-group.node-implemented {
+            opacity: 1;
+            filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.3));
+        }
+        
+        .node-group.node-implemented .node {
+            border: 2.5px solid var(--color-cyan) !important;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.25) !important;
+        }
+        
+        .node-group.node-implemented.node-master .node {
+            border-color: var(--color-purple) !important;
+            box-shadow: 0 0 15px rgba(213, 0, 249, 0.25) !important;
+        }
+
+        .node-group.node-implemented .node-title {
+            font-weight: 800;
+            color: #ffffff !important;
+        }
+
+        .node-group.node-implemented .node-type {
+            color: var(--color-cyan) !important;
+            font-weight: bold;
+        }
+
+        .node-group.node-future {
+            opacity: 0.45;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .node-group.node-future .node {
+            border: 1px dashed rgba(255, 255, 255, 0.2) !important;
+            background: rgba(5, 7, 15, 0.45) !important;
+            box-shadow: none !important;
+        }
+
+        .node-group.node-future .node-title {
+            color: rgba(255, 255, 255, 0.6) !important;
+            font-weight: 500;
+        }
+
+        .node-group.node-future .node-type {
+            color: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .node-group.node-future:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+
         /* SVG Connections Overlay */
         .connections-svg {
             position: absolute;
@@ -202,18 +252,66 @@
             filter: drop-shadow(0 0 3px var(--color-cyan));
         }
 
-        /* Details Side Panel */
+        .connection-line.highlight-amber {
+            stroke: var(--color-amber) !important;
+            stroke-width: 2.5 !important;
+            filter: drop-shadow(0 0 3px var(--color-amber)) !important;
+        }
+
+        .connection-line.highlight-orange {
+            stroke: #ff9100 !important;
+            stroke-width: 2.0 !important;
+            filter: drop-shadow(0 0 2px #ff9100) !important;
+        }
+
+        /* Drawer Overlay styling for Details Panel */
         .details-panel {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.2rem;
+            position: fixed;
+            top: 0;
+            right: -450px; /* Hidden offscreen by default */
+            width: 420px;
+            height: 100vh;
+            background: rgba(6, 10, 24, 0.98);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0;
+            padding: 2.5rem 1.5rem;
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            transition: right 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
             display: flex;
             flex-direction: column;
-            gap: 1.2rem;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
-            backdrop-filter: blur(16px);
-            height: 100%;
+            gap: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .details-panel.open {
+            right: 0; /* Slide in */
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: var(--color-text-dim);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+            z-index: 110;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-btn:hover {
+            color: var(--color-red);
+            background: rgba(255, 23, 68, 0.1);
+            transform: rotate(90deg);
         }
 
         .detail-section-title {
@@ -252,6 +350,26 @@
             border-color: rgba(213, 0, 249, 0.25);
             color: var(--color-purple);
             background: rgba(213, 0, 249, 0.04);
+        }
+
+        .loop-text {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .badge-green {
+            border-color: rgba(0, 230, 118, 0.25);
+            color: var(--color-green);
+            background: rgba(0, 230, 118, 0.04);
+        }
+
+        .badge-white {
+            border-color: rgba(255, 255, 255, 0.15);
+            color: var(--color-text-dim);
+            background: rgba(255, 255, 255, 0.02);
         }
 
         .btn-back {
@@ -315,6 +433,11 @@
                 <h1>AEGIS Orchestration Architecture</h1>
                 <div class="subtitle">Agentic & Autonomous System Deliberation Grid</div>
             </div>
+            <!-- Scope Legend -->
+            <div class="scope-legend" style="display: flex; flex-direction: column; gap: 4px; font-family: var(--font-mono); font-size: 0.75rem; border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 8px; background: rgba(255,255,255,0.01);">
+                <div style="color: var(--color-cyan); font-weight: bold;">■ Implemented (Prototype)</div>
+                <div style="color: var(--color-text-dim);">■ Future Scope</div>
+            </div>
             <button class="btn-back" onclick="window.close()">← Close Architecture</button>
         </header>
 
@@ -333,174 +456,168 @@
                 </svg>
 
                 <!-- ORCHESTRATOR -->
-                <div class="node-group node-master" id="node-master" data-node="master">
+                <div class="node-group node-master node-implemented" id="node-master" data-node="master">
                     <div class="node">
                         <div class="node-title">MasterAgent</div>
-                        <div class="node-type">Global Orchestrator</div>
+                        <div class="node-type">(Active in Prototype)</div>
                     </div>
                 </div>
 
                 <!-- LAYER 1: INGESTION -->
-                <div class="node-group node-ingest" id="node-weather" data-node="weather">
+                <div class="node-group node-ingest node-future" id="node-weather" data-node="weather">
                     <div class="node">
                         <div class="node-title">MeteorologyAgent</div>
-                        <div class="node-type">Weather API Stream</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
-                <div class="node-group node-ingest" id="node-unrest" data-node="unrest">
+                <div class="node-group node-ingest node-future" id="node-unrest" data-node="unrest">
                     <div class="node">
                         <div class="node-title">SocialSentimentAgent</div>
-                        <div class="node-type">Social Media Scraper</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
-                <div class="node-group node-ingest" id="node-news" data-node="news">
+                <div class="node-group node-ingest node-future" id="node-news" data-node="news">
                     <div class="node">
                         <div class="node-title">NewsReaderAgent</div>
-                        <div class="node-type">RSS Feed Parser</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
-                <div class="node-group node-ingest" id="node-satellite" data-node="satellite">
+                <div class="node-group node-ingest node-future" id="node-satellite" data-node="satellite">
                     <div class="node">
                         <div class="node-title">SatelliteRadarAgent</div>
-                        <div class="node-type">Earth Observation SAR</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
-                <div class="node-group node-ingest" id="node-iot" data-node="iot">
+                <div class="node-group node-ingest node-future" id="node-iot" data-node="iot">
                     <div class="node">
                         <div class="node-title">IoTFloodingSensorAgent</div>
-                        <div class="node-type">Ultrasonic Water Gauges</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
-                <div class="node-group node-ingest" id="node-telecom" data-node="telecom">
+                <div class="node-group node-ingest node-future" id="node-telecom" data-node="telecom">
                     <div class="node">
                         <div class="node-title">TelecomTrafficAgent</div>
-                        <div class="node-type">Cell Tower Density Ingestor</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
 
                 <!-- LAYER 2: PERCEPTION -->
-                <div class="node-group node-core" id="node-signal" data-node="signal">
+                <div class="node-group node-core node-implemented" id="node-signal" data-node="signal">
                     <div class="node">
                         <div class="node-title">SignalAgent</div>
-                        <div class="node-type">Telemetry Normalizer</div>
+                        <div class="node-type">(Active in Prototype)</div>
                     </div>
                 </div>
-                <div class="node-group node-core" id="node-detection" data-node="detection">
+                <div class="node-group node-core node-implemented" id="node-detection" data-node="detection">
                     <div class="node">
                         <div class="node-title">DetectionAgent</div>
-                        <div class="node-type">Threat Assessor</div>
+                        <div class="node-type">(Active in Prototype)</div>
                     </div>
                 </div>
-                <div class="node-group node-core" id="node-geospatial" data-node="geospatial">
+                <div class="node-group node-core node-future" id="node-geospatial" data-node="geospatial">
                     <div class="node">
                         <div class="node-title">GeospatialAgent</div>
-                        <div class="node-type">GIS Grid Vectorizer</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
-                <div class="node-group node-core" id="node-acoustic" data-node="acoustic">
+                <div class="node-group node-core node-future" id="node-acoustic" data-node="acoustic">
                     <div class="node">
                         <div class="node-title">AcousticIncidentAgent</div>
-                        <div class="node-type">Audio Threat Monitor</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
-                <div class="node-group node-core" id="node-anomaly" data-node="anomaly">
+                <div class="node-group node-core node-future" id="node-anomaly" data-node="anomaly">
                     <div class="node">
                         <div class="node-title">AnomalyDetectionAgent</div>
-                        <div class="node-type">ML Pattern Auditor</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
 
                 <!-- LAYER 3: DELIBERATION -->
-                <div class="node-group node-core" id="node-planner" data-node="planner">
+                <div class="node-group node-core node-implemented" id="node-planner" data-node="planner">
                     <div class="node">
                         <div class="node-title">PlannerAgent</div>
-                        <div class="node-type">Strategy Generator</div>
+                        <div class="node-type">(Active in Prototype)</div>
                     </div>
                 </div>
-                <div class="node-group node-audit" id="node-validation" data-node="validation">
+                <div class="node-group node-audit node-implemented" id="node-validation" data-node="validation">
                     <div class="node">
                         <div class="node-title">ValidationAgent</div>
-                        <div class="node-type">Constraint Auditor</div>
+                        <div class="node-type">(Active in Prototype)</div>
                     </div>
                 </div>
-                <div class="node-group node-audit" id="node-feedback" data-node="feedback">
+                <div class="node-group node-audit node-future" id="node-feedback" data-node="feedback">
                     <div class="node">
                         <div class="node-title">FeedbackAgent</div>
-                        <div class="node-type">Loop Updation Engine</div>
+                        <div class="node-type">Optimization Layer<br>(Future)</div>
                     </div>
                 </div>
-                <div class="node-group node-audit" id="node-error-control" data-node="error-control">
+                <div class="node-group node-audit node-future" id="node-error-control" data-node="error-control">
                     <div class="node">
                         <div class="node-title">ErrorControlAgent</div>
-                        <div class="node-type">Self-Correction Engine</div>
+                        <div class="node-type">Constraint Recovery<br>(Future)</div>
                     </div>
                 </div>
-                <div class="node-group node-audit" id="node-memory" data-node="memory">
+                <div class="node-group node-audit node-implemented" id="node-memory" data-node="memory">
                     <div class="node">
                         <div class="node-title">MemoryAgent</div>
-                        <div class="node-type">Precedent Library</div>
+                        <div class="node-type">(Active in Prototype)</div>
                     </div>
                 </div>
-                <div class="node-group node-audit" id="node-evaluator" data-node="evaluator">
+                <div class="node-group node-audit node-implemented" id="node-evaluator" data-node="evaluator">
                     <div class="node">
                         <div class="node-title">EvaluatorAgent</div>
-                        <div class="node-type">Aggregate Scorer</div>
+                        <div class="node-type">(Active in Prototype)</div>
                     </div>
                 </div>
-                <div class="node-group node-audit" id="node-risk-sim" data-node="risk-sim">
+                <div class="node-group node-audit node-future" id="node-risk-sim" data-node="risk-sim">
                     <div class="node">
                         <div class="node-title">RiskSimulateAgent</div>
-                        <div class="node-type">Monte Carlo Simulator</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
-                <div class="node-group node-audit" id="node-budget-opt" data-node="budget-opt">
+                <div class="node-group node-audit node-future" id="node-budget-opt" data-node="budget-opt">
                     <div class="node">
                         <div class="node-title">BudgetOptimizerAgent</div>
-                        <div class="node-type">Cost Optimizer</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
 
                 <!-- LAYER 4: ACTUATION -->
-                <div class="node-group node-master" id="node-decision" data-node="decision">
+                <div class="node-group node-master node-implemented" id="node-decision" data-node="decision">
                     <div class="node">
                         <div class="node-title">DecisionAgent</div>
-                        <div class="node-type">Resolution Engine</div>
+                        <div class="node-type">(Active in Prototype)</div>
                     </div>
                 </div>
-                <div class="node-group node-master" id="node-dispatch" data-node="dispatch">
+                <div class="node-group node-master node-future" id="node-dispatch" data-node="dispatch">
                     <div class="node">
                         <div class="node-title">DispatcherAgent</div>
-                        <div class="node-type">Asset Actuator</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
-                <div class="node-group node-master" id="node-broadcast" data-node="broadcast">
+                <div class="node-group node-master node-future" id="node-broadcast" data-node="broadcast">
                     <div class="node">
                         <div class="node-title">BroadcastAgent</div>
-                        <div class="node-type">EAS Alert Injective</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
-                <div class="node-group node-master" id="node-drone" data-node="drone">
+                <div class="node-group node-master node-future" id="node-drone" data-node="drone">
                     <div class="node">
                         <div class="node-title">AutonomousDroneAgent</div>
-                        <div class="node-type">Air Bridge Pilot</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
-                <div class="node-group node-master" id="node-logistics" data-node="logistics">
+                <div class="node-group node-master node-future" id="node-logistics" data-node="logistics">
                     <div class="node">
                         <div class="node-title">LogisticsRouterAgent</div>
-                        <div class="node-type">Ground Convoy Driver</div>
+                        <div class="node-type">(Future Scope)</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Details Panel -->
-            <div class="details-panel" id="details-panel">
-                <div style="text-align: center; margin-top: 6rem; color: var(--color-text-dim);">
-                    <p style="font-size: 1.8rem; margin-bottom: 1rem;">📐</p>
-                    <p style="font-weight: 600; font-size: 0.95rem;">AEGIS Cognitive Deliberation Grid</p>
-                    <p style="font-size: 0.8rem; margin-top: 5px;">Select any orchestrator, ingestor, processor, or actuator node to inspect its autonomous role, active connections, and future production scope.</p>
-                </div>
-            </div>
+            <!-- Details Panel (Initially Closed Drawer Overlay) -->
+            <div class="details-panel" id="details-panel"></div>
         </div>
     </div>
 
@@ -509,202 +626,202 @@
             master: {
                 title: "MasterAgent",
                 type: "Global System Orchestrator",
-                role: "The central nervous system of AEGIS. Operates as the parent state coordinator that initiates orchestration steps, handles asynchronous execution intervals, compiles audit alerts, and triggers immediate real-time replanning detours when a disruption signal is ingested.",
-                prototype: "Active Sandbox: Coordinates the sequential pipeline (Signal -> Detection -> Planner -> loops -> Memory -> Decision) and handles manual dashboard pause/resume commands.",
-                future: "Enterprise-scale daemon running on async Python thread pool utilizing Redis pub/sub. Dynamically routes task logs to a PostgreSQL database and exposes WebSocket event heartbeats.",
-                connections: "Supervises and coordinates all agents across the pipeline."
+                role: "Parent orchestrator coordinating state flow and execution loops across the entire system.",
+                status: "Active in Prototype",
+                impact: "Synchronizes the perception, deliberation, and actuation layers.",
+                future: "Enterprise-scale daemon running on async Python thread pools utilizing Redis pub/sub. Dynamically manages runtime task logs and exposes WebSocket event heartbeats for command consoles."
             },
             weather: {
                 title: "MeteorologyAgent",
                 type: "Weather API Stream Ingestor",
-                role: "Autonomous ingestion stream that queries external environmental servers, monitors geological storm indicators, and pushes real-time precipitation variables into the ingestion buffer.",
-                prototype: "Active Sandbox (Simulated): Mapped incident telemetry generated dynamically based on selected Scenario Variant (Rainfall & Water Levels).",
-                future: "Continuous API integrations with open weather networks, local river telemetry sensors, and meteorological radar grids to update data values every 30 seconds.",
-                connections: "Pushes raw weather data directly to the SignalAgent."
+                role: "Autonomous ingestion stream that queries external environmental servers for precipitation metrics.",
+                status: "Future Scope",
+                impact: "Provides early warning of rainfall volume and potential storm surges.",
+                future: "Continuous API integrations with open weather networks, local river telemetry sensors, and meteorological radar grids to update data values every 30 seconds."
             },
             unrest: {
                 title: "SocialSentimentAgent",
                 type: "Social Media Scraper Ingestor",
-                role: "Pulls crowd agitation telemetry and social sentiment indicators, analyzing civil unrest variables to alert the system of public safety threats.",
-                prototype: "Active Sandbox (Simulated): Civil unrest indices simulated based on selected Scenario Variant.",
-                future: "Asynchronous social scraping pipeline processing local geo-fenced comments and forum posts using LLM-driven keyword classification to detect flash mobs and protests.",
-                connections: "Sends social telemetry data to the SignalAgent."
+                role: "Pulls civil unrest telemetry, crowd agitation signals, and public panic indices.",
+                status: "Future Scope",
+                impact: "Flags sudden social unrest escalations and risk coordinates.",
+                future: "Asynchronous social scraping pipeline processing local geo-fenced posts and forum threads using LLM-driven classification to detect flash mobs and protests."
             },
             news: {
                 title: "NewsReaderAgent",
                 type: "News RSS Ingestor",
-                role: "Monitors online emergency feeds, news alerts, and police dispatch logs using text parsing to detect environmental or structural anomalies.",
-                prototype: "Active Sandbox (Simulated): Feeds incident parameters upon user disruption clicks (Bridge Collapse, Riot, etc.).",
-                future: "Scrapes police scanner texts and local press RSS feeds to flag structural failures (bridge collapses, blocked highways) immediately as they are reported.",
-                connections: "Feeds incident alerts to the SignalAgent."
+                role: "Monitors emergency bulletins, RSS feeds, and police scanner texts for anomalies.",
+                status: "Future Scope",
+                impact: "Detects structural accidents, road blockages, and municipal alert states.",
+                future: "Parses emergency dispatch signals and RSS news grids to automatically extract locations of transport accidents or road blockages."
             },
             satellite: {
                 title: "SatelliteRadarAgent",
                 type: "Earth Observation SAR Ingestor",
-                role: "Queries satellite synthetic aperture radar (SAR) imagery to monitor flood boundary expansion, surface wetness indices, and road blockage vectors.",
-                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
-                future: "Automated queries to Sentinel/Landsat image repositories to vector hazard maps.",
-                connections: "Pushes raw imaging indicators to SignalAgent."
+                role: "Queries satellite synthetic aperture radar (SAR) imagery to monitor flood boundaries.",
+                status: "Future Scope",
+                impact: "Enables cloud-penetrating water level visualization over active hazard maps.",
+                future: "Automated queries to Sentinel/Landsat image repositories to vector hazard maps."
             },
             iot: {
                 title: "IoTFloodingSensorAgent",
                 type: "IoT River Telemetry Monitor",
-                role: "Ingests continuous streams from physical ultrasonic water level sensors installed at major bridges and river bends.",
-                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
-                future: "Direct MQTT broker listener connecting to physical solar-powered telemetry sensors.",
-                connections: "Sends raw river water level levels to SignalAgent."
+                role: "Ingests live telemetry from physical ultrasonic water level sensors.",
+                status: "Future Scope",
+                impact: "Delivers exact water heights at major bridges and river bends.",
+                future: "Direct MQTT broker listener connecting to physical solar-powered telemetry sensors."
             },
             telecom: {
                 title: "TelecomTrafficAgent",
                 type: "Cell Density & Traffic Ingestor",
-                role: "Monitors anonymized cellular tower connection density to identify traffic jams and high-risk crowd gatherings during evacuations.",
-                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
-                future: "Secure API connection with telecom base stations to parse spatial device coordinates.",
-                connections: "Feeds network congestion data to SignalAgent."
+                role: "Monitors cellular tower density spikes to locate evacuation traffic jams.",
+                status: "Future Scope",
+                impact: "Identifies transit blockages and crowded public safety sectors.",
+                future: "Secure API connection with base transceiver stations (BTS) to trace spatial phone density metrics."
             },
             signal: {
                 title: "SignalAgent",
                 type: "Telemetry Normalizer",
-                role: "Receives raw feeds from all three ingestors, filters noise, maps input matrices, and normalizes variables into standard floats for subsequent threat computations.",
-                prototype: "Active Sandbox: Pushes simple normalized rainfall and unrest metrics to TaskState.",
-                future: "Data cleaning and vector alignment system translating raw unstructured sensor logs into clean geospatial JSON matrices.",
-                connections: "Normalizes Ingestion data; feeds clean telemetry to DetectionAgent."
+                role: "Filters raw feeds from ingestors and normalizes variables into standard threat metrics.",
+                status: "Active in Prototype",
+                impact: "Translates disparate sensor streams into clean, uniform float values.",
+                future: "Kafka-driven ingestion system converting raw, unstructured logs into structured JSON matrices."
             },
             detection: {
                 title: "DetectionAgent",
                 type: "Threat Assessor",
-                role: "Analyzes incoming variables, computes a normalized Crisis Severity Index, evaluates safety thresholds, and escalates the global Alert State (Green, Amber, Red).",
-                prototype: "Active Sandbox: Determines threat levels based on simple static threshold calculations.",
-                future: "Predictive neural networks running threat forecast algorithms to predict flash floods and protest escalation hours before they manifest in the field.",
-                connections: "Receives normalized signals; alerts MasterAgent and GeospatialAgent."
+                role: "Analyzes incoming variables to calculate a normalized Crisis Severity Index.",
+                status: "Active in Prototype",
+                impact: "Triggers global alert escalations (Amber/Red) when safety boundaries are breached.",
+                future: "Predictive neural networks running threat forecast algorithms to predict flash floods and incident curves."
             },
             geospatial: {
                 title: "GeospatialAgent",
                 type: "GIS Grid Vectorizer",
-                role: "Maps active hazard variables (flood vectors, riot coordinates) onto standard GIS grids to identify blocked transit corridors and safe evacuation sectors.",
-                prototype: "Active Sandbox (Simulated): Renders sector hazard maps on static dashboard cards.",
-                future: "Integration with map server APIs (e.g. ArcGIS, Mapbox) to dynamically recalculate available evacuation roads and safety cordons.",
-                connections: "Receives inputs from DetectionAgent; sends grid vector matrices to PlannerAgent."
+                role: "Overlays active threat zones and resource locations onto coordinate maps.",
+                status: "Future Scope",
+                impact: "Enables spatial routing of rescue assets around active hazard corridors.",
+                future: "Integration with GIS map servers (e.g., ArcGIS) to dynamically compute cost-surfaces for rescue routes."
             },
             acoustic: {
                 title: "AcousticIncidentAgent",
                 type: "Audio Threat Detector",
-                role: "Monitors emergency sirens, gunshots, and localized crowd decibel spikes using edge acoustic processing.",
-                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
-                future: "Audio classification neural network deploying on local smart microphones.",
-                connections: "Pushes acoustic alert states to DetectionAgent."
+                role: "Monitors emergency sirens, gunshot signatures, and decibel anomalies.",
+                status: "Future Scope",
+                impact: "Flags acoustic incidents before text-based news alerts are published.",
+                future: "Acoustic pattern classification models deploying directly on edge smart city microphones."
             },
             anomaly: {
                 title: "AnomalyDetectionAgent",
                 type: "ML Pattern Auditor",
-                role: "Scans normalized data streams for abnormal spikes or divergence from baseline safety expectations.",
-                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
-                future: "LSTM/Autoencoder models auditing sensor drift or sudden environmental shocks.",
-                connections: "Alerts DetectionAgent of anomalous sensor spikes."
+                role: "Scans normalized data streams for abnormal spikes or sensor drift.",
+                status: "Future Scope",
+                impact: "Prevents system errors by auditing sensor calibration and telemetry drift.",
+                future: "Autoencoder models running on continuous input streams to catch hardware anomalies."
             },
             planner: {
                 title: "PlannerAgent",
                 type: "Strategy Generator",
-                role: "Drafts multiple alternate evacuation and response paths (Fastest, Safest, Balanced), defining resource requirements, durations, and population coverage percentages.",
-                prototype: "Active Sandbox: Returns 3 strategy variants containing predefined steps.",
-                future: "Direct LLM calls generating custom action paths, cost estimates, and equipment logs in real-time based on the exact crisis signature.",
-                connections: "Drafts initial strategies; receives adjustment prompts from FeedbackAgent; passes plans to ValidationAgent."
+                role: "Drafts alternative mitigation strategies matching current severity constraints.",
+                status: "Active in Prototype",
+                impact: "Assembles detailed action plans with cost and coverage projections.",
+                future: "Closed-loop strategy generator utilizing specialized LLMs to assemble resources and schedules."
             },
             validation: {
                 title: "ValidationAgent",
                 type: "Constraint Auditor",
-                role: "Performs strict rule audits on all drafted plans against boundary conditions (such as the $220k budget ceiling, safety risk maximum of 4.0, and escort requirements in high-unrest sectors).",
-                prototype: "Active Sandbox: Flags budget and safety violations, and logs failure reports in state.validation.",
-                future: "Formal compliance verification engine mapping legal emergency mandates, airspace limits, and resource capacity graphs.",
-                connections: "Audits plans from PlannerAgent; sends failure logs to FeedbackAgent; passes compliant plans to MemoryAgent."
+                role: "Audits proposed plans against budget ceilings and safety constraints.",
+                status: "Active in Prototype",
+                impact: "Blocks unsafe or over-budget strategies from entering the action queue.",
+                future: "Formal compliance verification engine mapping legal emergency parameters and airspace limits."
             },
             feedback: {
-                title: "FeedbackAgent",
+                title: "Optimization Layer (Future)",
                 type: "Loop Updation Engine",
-                role: "Formulates plan adjustments and prompts based on constraint failures, low scores, or human guidance to optimize candidate strategies.",
-                prototype: "Active Sandbox (Simulated): Self-optimization loops are handled inline by the MasterAgent to refine PlannerAgent parameters.",
-                future: "Self-contained closed-loop LLM prompt manager translating audit violations into precise corrective prompts to achieve perfect compliance.",
-                connections: "Receives constraint/score feedback; directs update prompts to PlannerAgent."
+                role: "Formulates plan updates based on constraint failures or score penalties.",
+                status: "Future Scope",
+                impact: "Automatically adjusts plan variables to satisfy target constraints.",
+                future: "Generates feedback logs that guide the PlannerAgent to repair constraint violations."
             },
             "error-control": {
-                title: "ErrorControlAgent",
-                type: "Self-Correction & Learning Engine",
-                role: "Monitors execution exceptions, agent failure responses, and state drift. Dynamically corrects code-level parameters or re-calibrates logic to recover from failures.",
-                prototype: "Future Enterprise Target: Exceptions and boundaries handled by MasterAgent timeout and validation safeguards.",
-                future: "An AI coding sub-agent capable of patching local configuration thresholds and recovery pathways at runtime when an exception is intercepted.",
-                connections: "Intercepts runtime errors; applies logic adjustments to Deliberation Layer."
+                title: "Constraint Recovery (Future)",
+                type: "Exception Recovery & Adaptation Engine",
+                role: "Monitors execution exceptions and state drift to recover operational parameters.",
+                status: "Future Scope",
+                impact: "Maintains system uptime by resolving runtime logic exceptions.",
+                future: "An AI recovery sub-agent capable of adjusting local configuration thresholds and execution pathways at runtime."
             },
             memory: {
                 title: "MemoryAgent",
                 type: "Precedent Library",
-                role: "Retrieves historical emergency records from the experience library, computes vector similarity to current parameters, and applies empirical score boosts to historically proven strategies.",
-                prototype: "Active Sandbox: Compares current telemetry against CASE-101, 102, and 103, applying a +5.0 point aggregate boost to matching plans.",
-                future: "Vector database search engine (e.g. Qdrant/Pinecone) mapping historical disaster incident vectors to quickly pull outcomes from similar global operations.",
-                connections: "Ingests valid plans; applies historical precedent boosts; passes modified plans to EvaluatorAgent."
+                role: "Retrieves historical emergency records to apply empirical scores to current plan options.",
+                status: "Active in Prototype",
+                impact: "Prioritizes candidate plans that match successful past operations.",
+                future: "High-performance vector database indexing (e.g., Qdrant) matching current threat vectors against global disaster libraries."
             },
             evaluator: {
                 title: "EvaluatorAgent",
                 type: "Aggregate Scorer",
-                role: "Conducts multi-criteria evaluation of all valid strategies, calculating a weighted aggregate performance score (reflecting speed, cost, safety, and coverage weights).",
-                prototype: "Active Sandbox: Calculates scores mathematically using standard config weights.",
-                future: "Dynamic scoring algorithm adjusting weights based on system constraints (e.g. prioritizing speed over cost if water levels escalate rapidly).",
-                connections: "Scores plans; compiles performance matrices; feeds to DecisionAgent."
+                role: "Computes multi-criteria scores for candidate strategies based on weight configurations.",
+                status: "Active in Prototype",
+                impact: "Produces ranking metrics for strategy leaderboard resolution.",
+                future: "Dynamic scoring algorithm adjusting weights based on system constraints."
             },
             "risk-sim": {
                 title: "RiskSimulateAgent",
                 type: "Monte Carlo Risk Simulator",
-                role: "Runs thousands of simulated variants of each action plan against chaotic parameters to calculate statistical survival and success indexes.",
-                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
-                future: "Distributed compute cluster running dynamic simulations for plan risk analysis.",
-                connections: "Ingests plans; feeds evaluated risk indices to EvaluatorAgent."
+                role: "Runs simulations of action plans against chaotic variables to calculate success indexes.",
+                status: "Future Scope",
+                impact: "Identifies strategies vulnerable to cascading incident failures.",
+                future: "Distributed CPU clusters running thousands of parallel simulations to forecast plan success margins."
             },
             "budget-opt": {
                 title: "BudgetOptimizerAgent",
                 type: "Cost Efficiency Optimizer",
-                role: "Analyzes resource allocation plans to find cost-saving alternatives, maximizing resource usage efficiency under the budget ceiling.",
-                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
-                future: "Linear programming solvers optimizing resource-to-task assignment matrices.",
-                connections: "Feeds cost-efficiency indices to EvaluatorAgent."
+                role: "Analyzes resource allocations to identify cost-saving plan variations.",
+                status: "Future Scope",
+                impact: "Maximizes emergency resource utility under strict financial caps.",
+                future: "Linear programming solvers optimizing resource-to-task assignment matrices."
             },
             decision: {
                 title: "DecisionAgent",
                 type: "Resolution Engine",
-                role: "The final cognitive resolution module. Decides the optimal strategy, ranks the leaderboard, documents rejected plans with explainable justifications, and triggers fallback escalations if all options breach limits.",
-                prototype: "Active Sandbox: Invokes mock LLM to resolve plan rankings, confidence metrics, and fallback alerts.",
-                future: "Deliberative multi-model agent generating comprehensive, human-readable mission briefs, explainability reports, and risk checklists for command centers.",
-                connections: "Selects optimal strategy; maps leaderboard; feeds choice to DispatcherAgent."
+                role: "Selects the optimal strategy and generates explainability briefs.",
+                status: "Active in Prototype",
+                impact: "Produces clear human-readable decisions from the scoring leaderboard.",
+                future: "Explainable AI brief generator compiling mission briefs, risk checklists, and legal reviews for commanders."
             },
             dispatch: {
                 title: "DispatcherAgent",
                 type: "Asset Actuator",
-                role: "Translates the resolved digital strategy into actionable dispatch instructions, allocating tactical police squads, civil transport buses, and medical assets.",
-                prototype: "Active Sandbox (Simulated): Renders step details of the selected optimal plan on the dashboard UI.",
-                future: "Real-time dispatch system integrated with emergency vehicle GPS trackers, automated drone autopilots, and resource logistics databases.",
-                connections: "Ingests choice from DecisionAgent; executes actions; triggers BroadcastAgent."
+                role: "Translates selected plans into concrete physical dispatch instructions.",
+                status: "Future Scope",
+                impact: "Coordinates resources, transport vehicles, and support squads.",
+                future: "Real-time dispatch system integrated with emergency vehicle GPS trackers, automated drone autopilots, and resource databases."
             },
             broadcast: {
                 title: "BroadcastAgent",
                 type: "EAS Alert Actuator",
-                role: "Dispatches warnings to the general public, broadcasts emergency EAS signals, and updates digital road sign vectors in the affected sectors.",
-                prototype: "Active Sandbox (Simulated): Displays status text updates on the frontend dashboard.",
-                future: "Integration with national emergency broadcast APIs (EAS, FEMA IPAWS) and cellular SMS alert systems to push localized safety warnings.",
-                connections: "Receives alerts from DispatcherAgent; pushes warnings to the public."
+                role: "Distributes emergency alert bulletins and updates digital signage.",
+                status: "Future Scope",
+                impact: "Directs public safety warnings to communities in risk zones.",
+                future: "Integration with national emergency broadcast APIs (EAS, FEMA IPAWS) and cellular SMS alert systems to push localized safety warnings."
             },
             drone: {
                 title: "AutonomousDroneAgent",
                 type: "Aerial Dispatch Coordinator",
-                role: "Coordinates flight paths for rescue drones, aerial bridge drops, and visual surveillance feeds in flooded or blocked corridors.",
-                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
-                future: "Autonomous UAS traffic management (UTM) platform dispatching long-range UAVs.",
-                connections: "Receives directives from DispatcherAgent; deploys aerial assets."
+                role: "Coordinates drone flight paths for aerial bridge drops and surveillance.",
+                status: "Future Scope",
+                impact: "Provides live spatial imaging in flooded or blocked corridors.",
+                future: "Autonomous UAS traffic management platform dispatching long-range survey and supply UAVs."
             },
             logistics: {
                 title: "LogisticsRouterAgent",
                 type: "Convoy Routing Engine",
-                role: "Dynamically routes ground assets, supply trucks, and military convoy escorts through safe geo-zones.",
-                prototype: "Future Enterprise Target: Not implemented in current sandbox prototype.",
-                future: "Continuous dynamic routing engine integrated with live traffic data and blockages.",
-                connections: "Receives directives from DispatcherAgent; schedules ground logistics routes."
+                role: "Coordinates ground supply convoy paths through verified safe sectors.",
+                status: "Future Scope",
+                impact: "Ensures relief supplies bypass active hazard zones.",
+                future: "Dynamic ground transit routing algorithms updating base routes from real-time hazard grids."
             }
         };
 
@@ -730,9 +847,6 @@
             
             // Core Updation/Feedback Loops
             { from: 'node-validation', to: 'node-feedback' },
-            { from: 'node-feedback', to: 'node-planner', loop: true }, // Loop back
-            { from: 'node-validation', to: 'node-error-control' },
-            { from: 'node-error-control', to: 'node-planner', loop: true }, // Loop back
             
             // Deliberation to Evaluation
             { from: 'node-validation', to: 'node-memory' },
@@ -804,10 +918,19 @@
             const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
             defs.innerHTML = `
                 <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                    <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(255,255,255,0.25)" />
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(255,255,255,0.2)" />
                 </marker>
                 <marker id="arrow-highlight" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
                     <path d="M 0 0 L 10 5 L 0 10 z" fill="#00e5ff" />
+                </marker>
+                <marker id="arrow-cyan" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#00e5ff" />
+                </marker>
+                <marker id="arrow-amber" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffea00" />
+                </marker>
+                <marker id="arrow-orange" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#ff9100" />
                 </marker>
             `;
             svg.appendChild(defs);
@@ -829,16 +952,7 @@
                 const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
                 let dStr = "";
 
-                if (conn.loop) {
-                    // Loop back from Col 3 back to Planner in Col 3
-                    const startX = fromRect.left - canvasRect.left;
-                    const startY = fromRect.top - canvasRect.top + fromRect.height / 2;
-                    const endX = toRect.left - canvasRect.left;
-                    const endY = toRect.top - canvasRect.top + toRect.height / 2;
-                    
-                    const loopX = startX - 45; // corridor back
-                    dStr = `M ${startX} ${startY} H ${loopX} V ${endY} H ${endX}`;
-                } else if (Math.abs(x1 - x2) > 40) {
+                if (Math.abs(x1 - x2) > 40) {
                     // Different columns (orthogonal corridor routing)
                     let midX = (x1 + x2) / 2;
                     if (x1 < 200 && x2 > 300) midX = 275;      // Corridor 1 (Col 1 to Col 2)
@@ -851,51 +965,207 @@
                     dStr = `M ${x1} ${y1} L ${x2} ${y2}`;
                 }
 
+                // Style based on implemented vs future
+                const isFromImplemented = fromEl.classList.contains('node-implemented');
+                const isToImplemented = toEl.classList.contains('node-implemented');
+
                 path.setAttribute("d", dStr);
-                path.setAttribute("class", "connection-line");
                 path.setAttribute("id", `line-${index}`);
+                
+                if (isFromImplemented && isToImplemented) {
+                    path.setAttribute("class", "connection-line");
+                    path.setAttribute("style", "stroke: rgba(0, 229, 255, 0.45); stroke-width: 1.8; fill: none;");
+                } else {
+                    path.setAttribute("class", "connection-line");
+                    path.setAttribute("style", "stroke: rgba(255, 255, 255, 0.08); stroke-width: 1.0; stroke-dasharray: 4,4; fill: none;");
+                }
+                
                 path.setAttribute("marker-end", "url(#arrow)");
                 svg.appendChild(path);
             });
 
-            // 2. Draw global orchestrator commands from MasterAgent (dashed purple lines)
-            const masterEl = document.getElementById('node-master');
-            if (masterEl) {
-                const masterRect = masterEl.getBoundingClientRect();
-                const mX = (masterRect.left - canvasRect.left) + masterRect.width / 2;
-                const mY = (masterRect.top - canvasRect.top) + masterRect.height;
+            // 2. Draw refinement loop: Validation -> Optimization Layer -> Planner
+            const valEl = document.getElementById('node-validation');
+            const feedEl = document.getElementById('node-feedback');
+            const planEl = document.getElementById('node-planner');
+            
+            if (valEl && feedEl && planEl) {
+                const valRect = valEl.getBoundingClientRect();
+                const feedRect = feedEl.getBoundingClientRect();
+                const planRect = planEl.getBoundingClientRect();
 
-                orchestratorTargets.forEach((targetId) => {
-                    const targetEl = document.getElementById(targetId);
-                    if (!targetEl) return;
-                    const tRect = targetEl.getBoundingClientRect();
+                // 2a. Validation -> Optimization Layer (vertical down)
+                const vY = valRect.top - canvasRect.top + valRect.height;
+                const vX = valRect.left - canvasRect.left + valRect.width / 2;
+                const fY = feedRect.top - canvasRect.top;
+                const pathValFeed = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                pathValFeed.setAttribute("d", `M ${vX} ${vY} L ${vX} ${fY}`);
+                pathValFeed.setAttribute("id", "feedback-input-line");
+                pathValFeed.setAttribute("class", "connection-line");
+                pathValFeed.setAttribute("style", "stroke: var(--color-cyan); stroke-width: 2.0; fill: none;");
+                pathValFeed.setAttribute("marker-end", "url(#arrow-cyan)");
+                svg.appendChild(pathValFeed);
+
+                // 2b. Optimization Layer loop back to Planner (left corridor back)
+                const startX = feedRect.left - canvasRect.left;
+                const startY = feedRect.top - canvasRect.top + feedRect.height / 2;
+                const endX = planRect.left - canvasRect.left;
+                const endY = planRect.top - canvasRect.top + planRect.height / 2;
+                const loopX = 570; // Specific vertical refinement loop lane
+
+                const pathFeedPlan = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                pathFeedPlan.setAttribute("d", `M ${startX} ${startY} H ${loopX} V ${endY} H ${endX}`);
+                pathFeedPlan.setAttribute("id", "feedback-loop-line");
+                pathFeedPlan.setAttribute("class", "connection-line");
+                pathFeedPlan.setAttribute("style", "stroke: var(--color-cyan); stroke-width: 2.0; fill: none;");
+                pathFeedPlan.setAttribute("marker-end", "url(#arrow-cyan)");
+                svg.appendChild(pathFeedPlan);
+
+                // Add REFINEMENT LOOP text
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", loopX);
+                text.setAttribute("y", (startY + endY) / 2);
+                text.setAttribute("transform", `rotate(-90 ${loopX} ${(startY + endY) / 2})`);
+                text.setAttribute("fill", "var(--color-cyan)");
+                text.setAttribute("font-size", "7.5");
+                text.setAttribute("font-family", "var(--font-mono)");
+                text.setAttribute("font-weight", "bold");
+                text.setAttribute("letter-spacing", "1.5");
+                text.setAttribute("text-anchor", "middle");
+                text.textContent = "REFINEMENT LOOP";
+                svg.appendChild(text);
+            }
+
+            // 3. Draw CONSTRAINT LOOP:
+            const errorEl = document.getElementById('node-error-control');
+            const masterEl = document.getElementById('node-master');
+            if (errorEl && masterEl) {
+                const errorRect = errorEl.getBoundingClientRect();
+                const masterRect = masterEl.getBoundingClientRect();
+
+                // 3a. Error input lines from deliberation and actuation agents
+                const errorTargets = ['node-planner', 'node-validation', 'node-memory', 'node-evaluator', 'node-decision'];
+                const errInputX = 550; // Corridor lane for error inputs
+                const errRecvY_top = errorRect.top - canvasRect.top + 10;
+                const errRecvY_mid = errorRect.top - canvasRect.top + errorRect.height / 2;
+                const errRecvY_bot = errorRect.top - canvasRect.top + errorRect.height - 10;
+
+                errorTargets.forEach((targetId) => {
+                    const tEl = document.getElementById(targetId);
+                    if (!tEl) return;
+                    const tRect = tEl.getBoundingClientRect();
                     const tX_left = tRect.left - canvasRect.left;
                     const tX_right = tX_left + tRect.width;
-                    const tY_center = (tRect.top - canvasRect.top) + tRect.height / 2;
-                    const tY_top = tRect.top - canvasRect.top;
+                    const tY = tRect.top - canvasRect.top + tRect.height / 2;
 
+                    const pathErr = document.createElementNS("http://www.w3.org/2000/svg", "path");
                     let dStr = "";
-                    const isTopNode = (targetId === 'node-signal' || targetId === 'node-planner' || targetId === 'node-decision');
-                    
-                    if (isTopNode) {
-                        const targetX = tX_left + tRect.width / 2;
-                        dStr = `M ${mX} ${mY} V 90 H ${targetX} V ${tY_top}`;
+
+                    if (targetId === 'node-decision') {
+                        // Enter error control from the right edge
+                        dStr = `M ${tX_left} ${tY} H 835 V ${errRecvY_mid} H ${tX_left - 90}`;
                     } else {
-                        let corrX = 555;
-                        let entryX = tX_left;
-                        if (targetId.includes('dispatch') || targetId.includes('broadcast') || targetId.includes('drone') || targetId.includes('logistics')) {
-                            corrX = 835;
-                        }
-                        dStr = `M ${mX} ${mY} V 90 H ${corrX} V ${tY_center} H ${entryX}`;
+                        // Left corridor entry
+                        let entryY = errRecvY_mid;
+                        if (tY < errRecvY_mid) entryY = (targetId === 'node-planner') ? errRecvY_top : errRecvY_mid - 10;
+                        else entryY = (targetId === 'node-evaluator') ? errRecvY_bot : errRecvY_mid + 10;
+
+                        dStr = `M ${tX_left} ${tY} H ${errInputX} V ${entryY} H ${tX_left}`;
                     }
 
-                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-                    path.setAttribute("d", dStr);
-                    path.setAttribute("class", "connection-line");
-                    path.setAttribute("style", "stroke: rgba(213, 0, 249, 0.2); stroke-dasharray: 4,4; fill: none;");
-                    svg.appendChild(path);
+                    pathErr.setAttribute("d", dStr);
+                    pathErr.setAttribute("class", `connection-line error-input-line line-from-${targetId.replace('node-', '')}`);
+                    pathErr.setAttribute("style", "stroke: rgba(255, 145, 0, 0.3); stroke-width: 1.2; stroke-dasharray: 3,3; fill: none;");
+                    pathErr.setAttribute("marker-end", "url(#arrow-orange)");
+                    svg.appendChild(pathErr);
                 });
+
+                // 3b. Constraint Recovery loop back to MasterAgent (solid amber)
+                const startX = errorRect.left - canvasRect.left;
+                const startY = errorRect.top - canvasRect.top + errorRect.height / 2;
+                const endX = masterRect.left - canvasRect.left;
+                const endY = masterRect.top - canvasRect.top + masterRect.height / 2;
+                const loopX = 530; // Dedicated constraint loop lane
+
+                const pathErrMaster = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                pathErrMaster.setAttribute("d", `M ${startX} ${startY} H ${loopX} V ${endY} H ${endX}`);
+                pathErrMaster.setAttribute("id", "constraint-loop-line");
+                pathErrMaster.setAttribute("class", "connection-line");
+                pathErrMaster.setAttribute("style", "stroke: var(--color-amber); stroke-width: 2.0; fill: none;");
+                pathErrMaster.setAttribute("marker-end", "url(#arrow-amber)");
+                svg.appendChild(pathErrMaster);
+
+                // Add CONSTRAINT LOOP text
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", loopX);
+                text.setAttribute("y", (startY + endY) / 2 + 10);
+                text.setAttribute("transform", `rotate(-90 ${loopX} ${(startY + endY) / 2 + 10})`);
+                text.setAttribute("fill", "var(--color-amber)");
+                text.setAttribute("font-size", "7.5");
+                text.setAttribute("font-family", "var(--font-mono)");
+                text.setAttribute("font-weight", "bold");
+                text.setAttribute("letter-spacing", "1.5");
+                text.setAttribute("text-anchor", "middle");
+                text.textContent = "CONSTRAINT LOOP";
+                svg.appendChild(text);
             }
+
+            // 4. Draw global orchestrator commands from MasterAgent (dashed purple lines)
+            const masterRect = masterEl.getBoundingClientRect();
+            const mX = (masterRect.left - canvasRect.left) + masterRect.width / 2;
+            const mY = (masterRect.top - canvasRect.top) + masterRect.height;
+
+            orchestratorTargets.forEach((targetId) => {
+                const targetEl = document.getElementById(targetId);
+                if (!targetEl) return;
+                const tRect = targetEl.getBoundingClientRect();
+                const tX_left = tRect.left - canvasRect.left;
+                const tY_center = (tRect.top - canvasRect.top) + tRect.height / 2;
+                const tY_top = tRect.top - canvasRect.top;
+
+                let dStr = "";
+                const isTopNode = (targetId === 'node-signal' || targetId === 'node-planner' || targetId === 'node-decision');
+                
+                if (isTopNode) {
+                    const targetX = tX_left + tRect.width / 2;
+                    dStr = `M ${mX} ${mY} V 90 H ${targetX} V ${tY_top}`;
+                } else {
+                    let corrX = 555;
+                    let entryX = tX_left;
+                    if (targetId.includes('dispatch') || targetId.includes('broadcast') || targetId.includes('drone') || targetId.includes('logistics')) {
+                        corrX = 835;
+                    }
+                    dStr = `M ${mX} ${mY} V 90 H ${corrX} V ${tY_center} H ${entryX}`;
+                }
+
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", dStr);
+                path.setAttribute("class", "connection-line");
+                path.setAttribute("style", "stroke: rgba(213, 0, 249, 0.15); stroke-dasharray: 4,4; fill: none;");
+                svg.appendChild(path);
+            });
+        }
+
+        function closeDetailsPanel() {
+            document.getElementById('details-panel').classList.remove('open');
+            document.querySelectorAll('.node-group .node').forEach(el => el.classList.remove('active'));
+            
+            // Remove all highlight lines
+            document.querySelectorAll('.connection-line').forEach(line => {
+                line.classList.remove('highlight');
+                line.classList.remove('highlight-amber');
+                line.classList.remove('highlight-orange');
+                line.setAttribute("marker-end", "url(#arrow)");
+            });
+            const feedbackInput = document.getElementById('feedback-input-line');
+            if (feedbackInput) feedbackInput.setAttribute("style", "stroke: var(--color-cyan); stroke-width: 2.0; fill: none;");
+            const feedbackLoop = document.getElementById('feedback-loop-line');
+            if (feedbackLoop) feedbackLoop.setAttribute("style", "stroke: var(--color-cyan); stroke-width: 2.0; fill: none;");
+            const constraintLoop = document.getElementById('constraint-loop-line');
+            if (constraintLoop) constraintLoop.setAttribute("style", "stroke: var(--color-amber); stroke-width: 2.0; fill: none;");
+            document.querySelectorAll('.error-input-line').forEach(line => {
+                line.setAttribute("style", "stroke: rgba(255, 145, 0, 0.3); stroke-width: 1.2; stroke-dasharray: 3,3; fill: none;");
+            });
         }
 
         function showNodeDetails(nodeId) {
@@ -909,46 +1179,46 @@
 
             const panel = document.getElementById('details-panel');
             panel.innerHTML = `
+                <button class="close-btn" onclick="closeDetailsPanel()">&times;</button>
                 <div>
                     <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--color-cyan); margin-bottom: 2px;">${data.title}</h2>
-                    <div class="subtitle" style="margin-bottom: 0.8rem;">${data.type}</div>
+                    <div class="subtitle" style="margin-bottom: 1.2rem;">${data.type}</div>
                     
-                    <div class="detail-section-title">Cognitive Role & Actuation</div>
-                    <p class="detail-text">${data.role}</p>
-                </div>
+                    <div class="detail-section-title">Role</div>
+                    <p class="detail-text" style="margin-bottom: 1.2rem;">${data.role}</p>
 
-                <div>
-                    <div class="detail-section-title">Current Sandbox Scope</div>
-                    <p class="detail-text" style="color: var(--color-text-dim);">${data.prototype}</p>
-                    <div class="detail-badge-group">
-                        <span class="detail-badge">Deterministic Rules</span>
-                        <span class="detail-badge">In-Memory State</span>
-                    </div>
-                </div>
+                    <div class="detail-section-title">Status</div>
+                    <p class="detail-text" style="margin-bottom: 1.2rem; font-weight: bold; color: ${data.status.includes('Active') ? 'var(--color-green)' : 'var(--color-text-dim)'};">${data.status}</p>
 
-                <div>
-                    <div class="detail-section-title">Production & Future Project Scope</div>
+                    <div class="detail-section-title">Impact</div>
+                    <p class="detail-text" style="margin-bottom: 1.2rem;">${data.impact}</p>
+
+                    <div class="detail-section-title">Potential Role in Full-Scale Deployment</div>
                     <p class="detail-text" style="border-left: 2px solid var(--color-purple); padding-left: 10px; color: #f0f4f8;">${data.future}</p>
-                    <div class="detail-badge-group">
-                        <span class="detail-badge future-badge">Independent Agent</span>
-                        <span class="detail-badge future-badge">Closed-Loop AI</span>
-                        <span class="detail-badge future-badge">Continuous Scraper</span>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="detail-section-title">Graph Connections</div>
-                    <p class="detail-text font-mono" style="font-size: 0.75rem; color: var(--color-cyan);">${data.connections}</p>
                 </div>
             `;
+            panel.classList.add('open');
 
             // Highlight connection paths
             document.querySelectorAll('.connection-line').forEach(line => {
-                if (!line.getAttribute("style")) { // Don't wipe dashed lines
-                    line.classList.remove('highlight');
-                    line.setAttribute("marker-end", "url(#arrow)");
-                }
+                line.classList.remove('highlight');
+                line.classList.remove('highlight-amber');
+                line.classList.remove('highlight-orange');
+                line.setAttribute("marker-end", "url(#arrow)");
             });
+
+            // Reset loop line styles
+            const feedbackInput = document.getElementById('feedback-input-line');
+            if (feedbackInput) feedbackInput.setAttribute("style", "stroke: var(--color-cyan); stroke-width: 2.0; fill: none;");
+            const feedbackLoop = document.getElementById('feedback-loop-line');
+            if (feedbackLoop) feedbackLoop.setAttribute("style", "stroke: var(--color-cyan); stroke-width: 2.0; fill: none;");
+            const constraintLoop = document.getElementById('constraint-loop-line');
+            if (constraintLoop) constraintLoop.setAttribute("style", "stroke: var(--color-amber); stroke-width: 2.0; fill: none;");
+            document.querySelectorAll('.error-input-line').forEach(line => {
+                line.setAttribute("style", "stroke: rgba(255, 145, 0, 0.3); stroke-width: 1.2; stroke-dasharray: 3,3; fill: none;");
+            });
+
+            // Highlight sequential connections
             connections.forEach((conn, index) => {
                 if (conn.from === `node-${nodeId}` || conn.to === `node-${nodeId}`) {
                     const line = document.getElementById(`line-${index}`);
@@ -958,6 +1228,28 @@
                     }
                 }
             });
+
+            // Highlight loop-specific interactions
+            if (nodeId === 'feedback') {
+                if (feedbackInput) feedbackInput.setAttribute("style", "stroke: var(--color-cyan); stroke-width: 3.0; filter: drop-shadow(0 0 4px var(--color-cyan)); fill: none;");
+                if (feedbackLoop) feedbackLoop.setAttribute("style", "stroke: var(--color-cyan); stroke-width: 3.0; filter: drop-shadow(0 0 4px var(--color-cyan)); fill: none;");
+            } else if (nodeId === 'error-control') {
+                if (constraintLoop) constraintLoop.setAttribute("style", "stroke: var(--color-amber); stroke-width: 3.0; filter: drop-shadow(0 0 4px var(--color-amber)); fill: none;");
+                document.querySelectorAll('.error-input-line').forEach(line => {
+                    line.setAttribute("style", "stroke: #ff9100; stroke-width: 2.0; filter: drop-shadow(0 0 3px #ff9100); fill: none;");
+                });
+            } else if (['planner', 'validation', 'memory', 'evaluator', 'decision'].includes(nodeId)) {
+                const specificErrLine = document.querySelector(`.line-from-${nodeId}`);
+                if (specificErrLine) {
+                    specificErrLine.setAttribute("style", "stroke: #ff9100; stroke-width: 2.2; filter: drop-shadow(0 0 3px #ff9100); fill: none;");
+                }
+                if (nodeId === 'planner') {
+                    if (feedbackLoop) feedbackLoop.setAttribute("style", "stroke: var(--color-cyan); stroke-width: 3.0; filter: drop-shadow(0 0 4px var(--color-cyan)); fill: none;");
+                }
+                if (nodeId === 'validation') {
+                    if (feedbackInput) feedbackInput.setAttribute("style", "stroke: var(--color-cyan); stroke-width: 3.0; filter: drop-shadow(0 0 4px var(--color-cyan)); fill: none;");
+                }
+            }
         }
 
         // Add event listeners
@@ -970,8 +1262,7 @@
 
         window.addEventListener('load', () => {
             drawConnections();
-            // Default select feedback node
-            showNodeDetails('feedback');
+            // Panel starts closed, no default select
         });
 
         window.addEventListener('resize', drawConnections);

@@ -48,3 +48,6 @@ browser/
 browser_recordings/
 html_artifacts/
 *.log
+
+# Exclude generated PDF from git tracking
+demo_video_script.pdf
