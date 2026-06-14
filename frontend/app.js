@@ -9,7 +9,7 @@ const btnPause = document.getElementById('btn-control-pause');
 const btnStep = document.getElementById('btn-control-step');
 const btnStop = document.getElementById('btn-control-stop');
 const btnReset = document.getElementById('btn-reset');
-const btnRecordDemo = document.getElementById('btn-record-demo');
+// const btnRecordDemo = document.getElementById('btn-record-demo');
 
 // Readouts
 const readoutStatus = document.getElementById('readout-status-val');
@@ -47,11 +47,11 @@ const btnEventStorm = document.getElementById('btn-event-storm');
 let pollingInterval = null;
 let appConfig = null;
 
-// Screen recording variables
-let mediaRecorder = null;
-let recordedChunks = [];
-let recordingTimer = null;
-let recordingSeconds = 0;
+// Screen recording variables (Disabled)
+// let mediaRecorder = null;
+// let recordedChunks = [];
+// let recordingTimer = null;
+// let recordingSeconds = 0;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
@@ -71,7 +71,7 @@ btnPause.addEventListener('click', togglePauseResume);
 btnStep.addEventListener('click', stepExecution);
 btnStop.addEventListener('click', stopExecution);
 btnReset.addEventListener('click', resetSystemState);
-if (btnRecordDemo) btnRecordDemo.addEventListener('click', toggleRecording);
+// if (btnRecordDemo) btnRecordDemo.addEventListener('click', toggleRecording);
 
 btnEventBridge.addEventListener('click', () => injectDisruption('bridge_collapse'));
 btnEventRiot.addEventListener('click', () => injectDisruption('riot_outbreak'));
@@ -853,88 +853,88 @@ function renderReplanComparison(state, eventType) {
 }
 
 // SCREEN RECORDING CONTROLLER (MediaRecorder API)
-async function toggleRecording() {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-        stopRecording();
-    } else {
-        await startRecording();
-    }
-}
+// async function toggleRecording() {
+//     if (mediaRecorder && mediaRecorder.state === 'recording') {
+//         stopRecording();
+//     } else {
+//         await startRecording();
+//     }
+// }
 
-async function startRecording() {
-    recordedChunks = [];
-    recordingSeconds = 0;
+// async function startRecording() {
+//     recordedChunks = [];
+//     recordingSeconds = 0;
     
-    try {
-        const displayStream = await navigator.mediaDevices.getDisplayMedia({
-            video: {
-                cursor: "always",
-                frameRate: { ideal: 30 }
-            },
-            audio: false
-        });
+//     try {
+//         const displayStream = await navigator.mediaDevices.getDisplayMedia({
+//             video: {
+//                 cursor: "always",
+//                 frameRate: { ideal: 30 }
+//             },
+//             audio: false
+//         });
 
-        let options = { mimeType: 'video/webm;codecs=vp9' };
-        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-            options = { mimeType: 'video/webm;codecs=vp8' };
-        }
-        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-            options = { mimeType: 'video/webm' };
-        }
+//         let options = { mimeType: 'video/webm;codecs=vp9' };
+//         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+//             options = { mimeType: 'video/webm;codecs=vp8' };
+//         }
+//         if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+//             options = { mimeType: 'video/webm' };
+//         }
 
-        mediaRecorder = new MediaRecorder(displayStream, options);
+//         mediaRecorder = new MediaRecorder(displayStream, options);
 
-        mediaRecorder.ondataavailable = (e) => {
-            if (e.data && e.data.size > 0) {
-                recordedChunks.push(e.data);
-            }
-        };
+//         mediaRecorder.ondataavailable = (e) => {
+//             if (e.data && e.data.size > 0) {
+//                 recordedChunks.push(e.data);
+//             }
+//         };
 
-        mediaRecorder.onstop = () => {
-            clearInterval(recordingTimer);
-            displayStream.getTracks().forEach(track => track.stop());
+//         mediaRecorder.onstop = () => {
+//             clearInterval(recordingTimer);
+//             displayStream.getTracks().forEach(track => track.stop());
 
-            const blob = new Blob(recordedChunks, { type: 'video/webm' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `aegis_prototype_presentation_${new Date().toISOString().slice(0,10)}.webm`;
-            document.body.appendChild(a);
-            a.click();
+//             const blob = new Blob(recordedChunks, { type: 'video/webm' });
+//             const url = URL.createObjectURL(blob);
+//             const a = document.createElement('a');
+//             a.style.display = 'none';
+//             a.href = url;
+//             a.download = `aegis_prototype_presentation_${new Date().toISOString().slice(0,10)}.webm`;
+//             document.body.appendChild(a);
+//             a.click();
             
-            setTimeout(() => {
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            }, 100);
+//             setTimeout(() => {
+//                 document.body.removeChild(a);
+//                 window.URL.revokeObjectURL(url);
+//             }, 100);
 
-            btnRecordDemo.innerText = "⏺ Record Demo";
-            btnRecordDemo.style.borderColor = "var(--color-red)";
-            btnRecordDemo.style.color = "var(--color-red)";
-            btnRecordDemo.classList.remove('recording-pulse');
-        };
+//             // btnRecordDemo.innerText = "⏺ Record Demo";
+//             // btnRecordDemo.style.borderColor = "var(--color-red)";
+//             // btnRecordDemo.style.color = "var(--color-red)";
+//             // btnRecordDemo.classList.remove('recording-pulse');
+//         };
 
-        mediaRecorder.start();
+//         // mediaRecorder.start();
 
-        btnRecordDemo.innerText = "⏹ Stop (00:00)";
-        btnRecordDemo.style.borderColor = "#ffffff";
-        btnRecordDemo.style.color = "#ffffff";
-        btnRecordDemo.classList.add('recording-pulse');
+//         // btnRecordDemo.innerText = "⏹ Stop (00:00)";
+//         // btnRecordDemo.style.borderColor = "#ffffff";
+//         // btnRecordDemo.style.color = "#ffffff";
+//         // btnRecordDemo.classList.add('recording-pulse');
 
-        recordingTimer = setInterval(() => {
-            recordingSeconds++;
-            const mins = String(Math.floor(recordingSeconds / 60)).padStart(2, '0');
-            const secs = String(recordingSeconds % 60).padStart(2, '0');
-            btnRecordDemo.innerText = `⏹ Stop (${mins}:${secs})`;
-        }, 1000);
+//         // recordingTimer = setInterval(() => {
+//         //     recordingSeconds++;
+//         //     const mins = String(Math.floor(recordingSeconds / 60)).padStart(2, '0');
+//         //     const secs = String(recordingSeconds % 60).padStart(2, '0');
+//         //     // btnRecordDemo.innerText = `⏹ Stop (${mins}:${secs})`;
+//         // }, 1000);
 
-    } catch (err) {
-        console.error("Screen recording access denied or error occurred:", err);
-    }
-}
+//     // } catch (err) {
+//     //     console.error("Screen recording access denied or error occurred:", err);
+//     // }
+// }
 
-function stopRecording() {
-    if (mediaRecorder && mediaRecorder.state === 'recording') {
-        mediaRecorder.stop();
-    }
-}
+// // function stopRecording() {
+// //     if (mediaRecorder && mediaRecorder.state === 'recording') {
+// //         mediaRecorder.stop();
+// //     }
+// // }
